@@ -4,7 +4,7 @@
  * Direct tool invocation with JSON output. Agent-native.
  */
 
-import { loadEnv } from "./envcrypt.js";
+import "dotenv/config";
 import { parseArgs } from "util";
 import os from "os";
 import fs from "fs";
@@ -17,11 +17,8 @@ if (process.argv.includes("--dry-run")) process.env.DRY_RUN = "true";
 const meridianDir = path.join(os.homedir(), ".meridian");
 const meridianEnv = path.join(meridianDir, ".env");
 if (fs.existsSync(meridianEnv)) {
-  loadEnv({
-    envPath: meridianEnv,
-    keyPath: path.join(meridianDir, ".envrypt"),
-    override: false,
-  });
+  const { config: loadDotenv } = await import("dotenv");
+  loadDotenv({ path: meridianEnv, override: false });
 }
 
 // ─── Output helpers ───────────────────────────────────────────────
@@ -74,7 +71,7 @@ Output: { done: true, report: "..." }
 ### meridian deploy --pool <addr> --amount <sol> [--bins-below 69] [--bins-above 0] [--strategy bid_ask|spot] [--dry-run]
 Deploys a new LP position. All safety checks apply.
 \`\`\`
-Output: { success, position, pool_name, txs, price_range, range_coverage, bin_step }
+Output: { success, position, pool_name, txs, price_range, bin_step }
 \`\`\`
 
 ### meridian claim --position <addr>
@@ -96,9 +93,9 @@ Output: { success, tx, input_amount, output_amount }
 \`\`\`
 
 ### meridian candidates [--limit 5]
-Returns top pool candidates fully enriched: pool metrics, token audit, holders, smart wallets, narrative, active bin, pool memory.
+Returns top pool candidates from Meteora screening API.
 \`\`\`
-Output: { candidates: [{name, pool, bin_step, fee_pct, volume, tvl, organic_score, active_bin, smart_wallets, token: {holders, audit, global_fees_sol, ...}, holders, narrative, pool_memory}] }
+Output: { candidates: [{name, pool, bin_step, fee_pct, volume, tvl, organic_score}] }
 \`\`\`
 
 ### meridian config get
@@ -199,63 +196,8 @@ switch (subcommand) {
   // ── candidates ───────────────────────────────────────────────────
   case "candidates": {
     const { getTopCandidates } = await import("./tools/screening.js");
-    const { getActiveBin } = await import("./tools/dlmm.js");
-    const { getTokenInfo, getTokenHolders, getTokenNarrative } = await import("./tools/token.js");
-    const { checkSmartWalletsOnPool } = await import("./smart-wallets.js");
-    const { recallForPool } = await import("./pool-memory.js");
-
     const limit = parseInt(flags.limit || "5");
-    const raw = await getTopCandidates({ limit });
-    const pools = raw.candidates || raw.pools || [];
-
-    const enriched = [];
-    for (const pool of pools) {
-      const mint = pool.base?.mint;
-      const [activeBin, smartWallets, tokenInfo, holders, narrative] = await Promise.allSettled([
-        getActiveBin({ pool_address: pool.pool }),
-        checkSmartWalletsOnPool({ pool_address: pool.pool }),
-        mint ? getTokenInfo({ query: mint }) : Promise.resolve(null),
-        mint ? getTokenHolders({ mint }) : Promise.resolve(null),
-        mint ? getTokenNarrative({ mint }) : Promise.resolve(null),
-      ]);
-      const ti = tokenInfo.status === "fulfilled" ? tokenInfo.value?.results?.[0] : null;
-      enriched.push({
-        pool: pool.pool,
-        name: pool.name,
-        bin_step: pool.bin_step,
-        fee_pct: pool.fee_pct,
-        fee_active_tvl_ratio: pool.fee_active_tvl_ratio,
-        volume: pool.volume_window,
-        tvl: pool.tvl ?? pool.active_tvl,
-        volatility: pool.volatility,
-        mcap: pool.mcap,
-        organic_score: pool.organic_score,
-        active_pct: pool.active_pct,
-        price_change_pct: pool.price_change_pct,
-        active_bin: activeBin.status === "fulfilled" ? activeBin.value?.binId : null,
-        smart_wallets: smartWallets.status === "fulfilled" ? (smartWallets.value?.in_pool || []).map(w => w.name) : [],
-        token: {
-          mint,
-          symbol: pool.base?.symbol,
-          holders: pool.holders,
-          mcap: ti?.mcap,
-          launchpad: ti?.launchpad,
-          global_fees_sol: ti?.global_fees_sol,
-          price_change_1h: ti?.stats_1h?.price_change,
-          net_buyers_1h: ti?.stats_1h?.net_buyers,
-          audit: {
-            top10_pct: ti?.audit?.top_holders_pct,
-            bots_pct: ti?.audit?.bot_holders_pct,
-          },
-        },
-        holders: holders.status === "fulfilled" ? holders.value : null,
-        narrative: narrative.status === "fulfilled" ? narrative.value?.narrative : null,
-        pool_memory: recallForPool(pool.pool) || null,
-      });
-      await new Promise(r => setTimeout(r, 150)); // avoid 429s
-    }
-
-    out({ candidates: enriched, total_screened: raw.total_screened });
+    out(await getTopCandidates({ limit }));
     break;
   }
 
