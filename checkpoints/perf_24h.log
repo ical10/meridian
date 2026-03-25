@@ -1,0 +1,36 @@
+<stdin>:58: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+═══════════════════════════════════════════════════════════════════
+[2026-06-10T16:39:00Z] PERFORMANCE CHECKPOINT — 24h
+  window: since 2026-06-09T16:39
+  strategy: momentum_spot_pump
+═══════════════════════════════════════════════════════════════════
+
+--- CLOSES ---
+  total:   10  (wins 5, losses 5)  WR=50.0%
+  net:     $-10.17
+  best:    $+1.32 (+2.53%)
+  worst:   $-7.22 (-14.03%)
+
+--- EXIT REASON BREAKDOWN ---
+  LOW_YIELD: 3
+  TRAILING_TP: 3
+  STOP_LOSS: 3
+  TP: 1
+
+--- CURRENT STATE ---
+  open positions: 1
+    FCM-SOL peak=0.19% deployed=2026-06-10T16:16:26
+
+--- CONFIG SNAPSHOT ---
+  strategy: spot
+  category: trending
+  takeProfitPct: 10
+  stopLossPct: -15
+  trailingDropPct: 0.5
+  feeActiveTvlBands: [[0.2, 1.0], [3.0, None]]
+  minVolume: 1000
+  minTvl: 10000
+  maxTvl: 150000
+  minMcap: 25000
+  deployAmountSol: 0.8
+[done: 16:39:01Z]
