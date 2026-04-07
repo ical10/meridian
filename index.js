@@ -980,6 +980,19 @@ Focus on: hold duration, entry/exit timing, what win rates look like, whether sc
   // Non-TTY: start immediately
   log("startup", "Non-TTY mode — starting cron cycles immediately.");
   startCronJobs();
+  startPolling((text) => {
+    log("telegram", `Incoming: ${text}`);
+    (async () => {
+      try {
+        const result = await agentLoop(text, config.llm.maxSteps, [], "GENERAL");
+        log("telegram", `Reply (${result?.content?.length ?? 0} chars): ${result?.content?.slice(0, 80) ?? "(empty)"}`);
+        if (result?.content) await sendMessage(result.content);
+      } catch (e) {
+        log("telegram_error", `Handler error: ${e.message}`);
+        await sendMessage(`Error: ${e.message}`).catch(() => {});
+      }
+    })();
+  });
   maybeRunMissedBriefing().catch(() => { });
   (async () => {
     try {
