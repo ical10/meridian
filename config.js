@@ -15,7 +15,7 @@ if (u.walletKey) process.env.WALLET_PRIVATE_KEY ||= u.walletKey;
 if (u.llmModel)  process.env.LLM_MODEL          ||= u.llmModel;
 if (u.llmBaseUrl) process.env.LLM_BASE_URL      ||= u.llmBaseUrl;
 if (u.llmApiKey)  process.env.LLM_API_KEY       ||= u.llmApiKey;
-if (u.dryRun !== undefined) process.env.DRY_RUN ||= String(u.dryRun);
+if (u.dryRun !== undefined) process.env.DRY_RUN = String(u.dryRun);
 
 export const config = {
   // ─── Risk Limits ─────────────────────────
@@ -46,6 +46,7 @@ export const config = {
     minTokenAgeHours:   u.minTokenAgeHours   ?? null, // null = no minimum
     maxTokenAgeHours:   u.maxTokenAgeHours   ?? null, // null = no maximum
     athFilterPct:       u.athFilterPct       ?? null, // e.g. -20 = only deploy if price is >= 20% below ATH
+    maxVolatility:      u.maxVolatility      ?? null, // null = no cap
   },
 
   // ─── Position Management ────────────────

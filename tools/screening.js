@@ -1,7 +1,27 @@
 import { config } from "../config.js";
 import { isBlacklisted } from "../token-blacklist.js";
 import { isDevBlocked, getBlockedDevs } from "../dev-blocklist.js";
+import { isPoolOnCooldown } from "../pool-memory.js";
 import { log } from "../logger.js";
+
+// ─── Recently-seen pool tracker (in-memory, resets on restart) ───
+const _recentlySeen = new Map(); // pool_address → timestamp
+const SEEN_COOLDOWN_MS = 45 * 60 * 1000; // 45 minutes
+
+function markSeen(poolAddress) {
+  _recentlySeen.set(poolAddress, Date.now());
+}
+
+function wasRecentlySeen(poolAddress) {
+  const ts = _recentlySeen.get(poolAddress);
+  if (!ts) return false;
+  if (Date.now() - ts > SEEN_COOLDOWN_MS) {
+    _recentlySeen.delete(poolAddress);
+    return false;
+  }
+  return true;
+}
+
 
 const DATAPI_JUP = "https://datapi.jup.ag/v1";
 
@@ -102,6 +122,14 @@ export async function discoverPools({
     }
   }
 
+  // Volatility cap
+  const maxVol = config.screening.maxVolatility;
+  if (maxVol != null) {
+    const before = pools.length;
+    pools = pools.filter((p) => p.volatility == null || p.volatility <= maxVol);
+    if (pools.length < before) log("screening", `Volatility filter removed ${before - pools.length} pool(s) above ${maxVol}`);
+  }
+
   return {
     total: data.total,
     pools,
@@ -114,7 +142,7 @@ export async function discoverPools({
  */
 export async function getTopCandidates({ limit = 10 } = {}) {
   const { config } = await import("../config.js");
-  const { pools } = await discoverPools({ page_size: 50 });
+  const { pools } = await discoverPools({ page_size: 100 });
 
   // Exclude pools where the wallet already has an open position
   const { getMyPositions } = await import("./dlmm.js");
@@ -122,9 +150,26 @@ export async function getTopCandidates({ limit = 10 } = {}) {
   const occupiedPools = new Set(positions.map((p) => p.pool));
   const occupiedMints = new Set(positions.map((p) => p.base_mint).filter(Boolean));
 
-  const eligible = pools
-    .filter((p) => !occupiedPools.has(p.pool) && !occupiedMints.has(p.base?.mint))
-    .slice(0, limit);
+  // Partition into fresh and recently-seen
+  const fresh = [];
+  const seen = [];
+  for (const p of pools) {
+    if (occupiedPools.has(p.pool) || occupiedMints.has(p.base?.mint)) continue;
+    if (isPoolOnCooldown(p.pool)) continue;
+    if (wasRecentlySeen(p.pool)) {
+      seen.push(p);
+    } else {
+      fresh.push(p);
+    }
+  }
+
+  // Prioritize fresh pools, backfill with recently-seen if needed
+  const eligible = [...fresh, ...seen].slice(0, limit);
+
+  // Mark all candidates as seen for next cycle
+  for (const p of eligible) markSeen(p.pool);
+
+  if (seen.length > 0) log("screening", `Deprioritized ${seen.length} recently-seen pool(s), ${fresh.length} fresh`);
 
   // Enrich with OKX data — advanced info (risk/bundle/sniper) + ATH price (no API key required)
   if (eligible.length > 0) {
