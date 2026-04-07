@@ -1,9 +1,27 @@
 import { config } from "../config.js";
 import { isBlacklisted } from "../token-blacklist.js";
 import { isDevBlocked, getBlockedDevs } from "../dev-blocklist.js";
-import { log } from "../logger.js";
 import { isBaseMintOnCooldown, isPoolOnCooldown } from "../pool-memory.js";
 import { confirmIndicatorPreset } from "./chart-indicators.js";
+import { log } from "../logger.js";
+
+// ─── Recently-seen pool tracker (in-memory, resets on restart) ───
+const _recentlySeen = new Map(); // pool_address → timestamp
+const SEEN_COOLDOWN_MS = 45 * 60 * 1000; // 45 minutes
+
+function markSeen(poolAddress) {
+  _recentlySeen.set(poolAddress, Date.now());
+}
+
+function wasRecentlySeen(poolAddress) {
+  const ts = _recentlySeen.get(poolAddress);
+  if (!ts) return false;
+  if (Date.now() - ts > SEEN_COOLDOWN_MS) {
+    _recentlySeen.delete(poolAddress);
+    return false;
+  }
+  return true;
+}
 
 const DATAPI_JUP = "https://datapi.jup.ag/v1";
 
@@ -253,6 +271,14 @@ export async function discoverPools({
     }
   }
 
+  // Volatility cap
+  const maxVol = config.screening.maxVolatility;
+  if (maxVol != null) {
+    const before = pools.length;
+    pools = pools.filter((p) => p.volatility == null || p.volatility <= maxVol);
+    if (pools.length < before) log("screening", `Volatility filter removed ${before - pools.length} pool(s) above ${maxVol}`);
+  }
+
   return {
     total: data.total,
     pools,
@@ -265,7 +291,7 @@ export async function discoverPools({
  */
 export async function getTopCandidates({ limit = 10 } = {}) {
   const { config } = await import("../config.js");
-  const { pools } = await discoverPools({ page_size: 50 });
+  const { pools } = await discoverPools({ page_size: 100 });
   const filteredOut = [];
 
   // Exclude pools where the wallet already has an open position
@@ -274,30 +300,43 @@ export async function getTopCandidates({ limit = 10 } = {}) {
   const occupiedPools = new Set(positions.map((p) => p.pool));
   const occupiedMints = new Set(positions.map((p) => p.base_mint).filter(Boolean));
 
-  const eligible = pools
-    .filter((p) => {
-      if (occupiedPools.has(p.pool)) {
-        pushFilteredReason(filteredOut, p, "already have an open position in this pool");
-        return false;
-      }
-      if (occupiedMints.has(p.base?.mint)) {
-        pushFilteredReason(filteredOut, p, "already holding this base token in another pool");
-        return false;
-      }
-      if (isPoolOnCooldown(p.pool)) {
-        log("screening", `Filtered cooldown pool ${p.name} (${p.pool.slice(0, 8)})`);
-        pushFilteredReason(filteredOut, p, "pool cooldown active");
-        return false;
-      }
-      if (isBaseMintOnCooldown(p.base?.mint)) {
-        log("screening", `Filtered cooldown token ${p.base?.symbol} (${p.base?.mint?.slice(0, 8)})`);
-        pushFilteredReason(filteredOut, p, "token cooldown active");
-        return false;
-      }
-      return true;
-    })
-    .sort((a, b) => scoreCandidate(b) - scoreCandidate(a))
-    .slice(0, limit);
+  // Partition into fresh and recently-seen, with full filter reasons
+  const fresh = [];
+  const seen = [];
+  for (const p of pools) {
+    if (occupiedPools.has(p.pool)) {
+      pushFilteredReason(filteredOut, p, "already have an open position in this pool");
+      continue;
+    }
+    if (occupiedMints.has(p.base?.mint)) {
+      pushFilteredReason(filteredOut, p, "already holding this base token in another pool");
+      continue;
+    }
+    if (isPoolOnCooldown(p.pool)) {
+      log("screening", `Filtered cooldown pool ${p.name} (${p.pool.slice(0, 8)})`);
+      pushFilteredReason(filteredOut, p, "pool cooldown active");
+      continue;
+    }
+    if (isBaseMintOnCooldown(p.base?.mint)) {
+      log("screening", `Filtered cooldown token ${p.base?.symbol} (${p.base?.mint?.slice(0, 8)})`);
+      pushFilteredReason(filteredOut, p, "token cooldown active");
+      continue;
+    }
+    if (wasRecentlySeen(p.pool)) {
+      seen.push(p);
+    } else {
+      fresh.push(p);
+    }
+  }
+
+  // Prioritize fresh pools, backfill with recently-seen if needed
+  const sorted = [...fresh, ...seen].sort((a, b) => scoreCandidate(b) - scoreCandidate(a));
+  const eligible = sorted.slice(0, limit);
+
+  // Mark all candidates as seen for next cycle
+  for (const p of eligible) markSeen(p.pool);
+
+  if (seen.length > 0) log("screening", `Deprioritized ${seen.length} recently-seen pool(s), ${fresh.length} fresh`);
 
   if (config.screening.avoidPvpSymbols && eligible.length > 0) {
     await enrichPvpRisk(eligible);
