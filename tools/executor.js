@@ -227,6 +227,19 @@ const toolMap = {
       return { success: false, unknown, reason };
     }
 
+    // Validate model keys — reject obviously invalid model names
+    const MODEL_KEYS = new Set(["managementModel", "screeningModel", "generalModel"]);
+    for (const [key, val] of Object.entries(applied)) {
+      if (MODEL_KEYS.has(key) && typeof val === "string" && !val.includes("claude") && !val.includes("/") && !val.includes("kimi") && !val.includes("gpt") && !val.includes("gemini")) {
+        log("config", `update_config rejected invalid model for ${key}: "${val}"`);
+        delete applied[key];
+      }
+    }
+
+    if (Object.keys(applied).length === 0) {
+      return { success: false, error: "All changes rejected by validation", reason };
+    }
+
     // Apply to live config immediately
     for (const [key, val] of Object.entries(applied)) {
       const [section, field] = CONFIG_MAP[key];
