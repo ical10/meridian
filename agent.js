@@ -193,16 +193,18 @@ export async function agentLoop(goal, maxSteps = config.llm.maxSteps, sessionHis
       let usedModel = activeModel;
       // Force a tool call on step 0 for action intents — prevents the model from inventing deploy/close outcomes
       const ACTION_INTENTS = /\b(deploy|open|add liquidity|close|exit|withdraw|claim|swap|block|unblock)\b/i;
-      let toolChoice = (step === 0 && (ACTION_INTENTS.test(goal) || mustUseRealTool)) ? "required" : "auto";
+      const isThinkingModel = usedModel.includes("kimi") || usedModel.includes("o1") || usedModel.includes("o3");
+      let toolChoice = (step === 0 && (ACTION_INTENTS.test(goal) || mustUseRealTool) && !isThinkingModel) ? "required" : "auto";
 
       for (let attempt = 0; attempt < 3; attempt++) {
+        const temp = isThinkingModel ? 1 : config.llm.temperature;
         try {
           response = await client.chat.completions.create({
             model: usedModel,
             messages,
             tools: getToolsForRole(agentType, goal),
             tool_choice: toolChoice,
-            temperature: config.llm.temperature,
+            temperature: temp,
             max_tokens: maxOutputTokens ?? config.llm.maxTokens,
           });
         } catch (error) {
