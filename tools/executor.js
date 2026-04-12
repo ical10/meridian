@@ -236,6 +236,13 @@ const toolMap = {
       }
     }
 
+    // Validate timeframe — Pool Discovery API only accepts these values
+    const VALID_TIMEFRAMES = new Set(["5m", "30m", "1h", "2h", "4h", "12h", "24h"]);
+    if (applied.timeframe != null && !VALID_TIMEFRAMES.has(String(applied.timeframe))) {
+      log("config", `update_config rejected invalid timeframe: "${applied.timeframe}" (valid: ${[...VALID_TIMEFRAMES].join(", ")})`);
+      delete applied.timeframe;
+    }
+
     if (Object.keys(applied).length === 0) {
       return { success: false, error: "All changes rejected by validation", reason };
     }
