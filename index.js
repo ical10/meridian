@@ -1296,7 +1296,9 @@ async function telegramHandler(msg) {
   try {
     log("telegram", `Incoming: ${text}`);
     const hasCloseIntent = /\bclose\b|\bsell\b|\bexit\b|\bwithdraw\b/i.test(text);
-    const isDeployRequest = !hasCloseIntent && /\bdeploy\b|\bopen position\b|\blp into\b|\badd liquidity\b/i.test(text);
+    // Config-mutation phrases like "change max deploy" mention "deploy" but are not deploy requests
+    const hasConfigMutationIntent = /\b(set|change|update|configure|adjust|raise|lower|increase|decrease)\b.*\b(max|min|threshold|limit|interval|wait|cooldown|amount|pct|percent|deploy|position|model|config|setting)\b/i.test(text);
+    const isDeployRequest = !hasCloseIntent && !hasConfigMutationIntent && /\bdeploy\b|\bopen position\b|\blp into\b|\badd liquidity\b/i.test(text);
     const agentRole = isDeployRequest ? "SCREENER" : "GENERAL";
     const agentModel = agentRole === "SCREENER" ? config.llm.screeningModel : config.llm.generalModel;
     liveMessage = await createLiveMessage("🤖 Live Update", `Request: ${text.slice(0, 240)}`);
