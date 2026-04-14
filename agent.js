@@ -245,6 +245,9 @@ export async function agentLoop(goal, maxSteps = config.llm.maxSteps, sessionHis
         log("error", `Bad API response: ${JSON.stringify(response).slice(0, 200)}`);
         throw new Error(`API returned no choices: ${response.error?.message || JSON.stringify(response)}`);
       }
+      if (response.usage) {
+        log("llm_cost", `${usedModel} role=${agentType} step=${step} prompt=${response.usage.prompt_tokens ?? "?"} completion=${response.usage.completion_tokens ?? "?"} total=${response.usage.total_tokens ?? "?"}`);
+      }
       const msg = response.choices[0].message;
       // Repair malformed tool call JSON before pushing to history —
       // the API rejects the next request if history contains invalid JSON args
