@@ -420,7 +420,17 @@ export function updatePnlAndCheckExits(position_address, positionData, mgmtConfi
   if (changed) save(state);
 
   // ── Stop loss ──────────────────────────────────────────────────
-  if (!pnl_pct_suspicious && currentPnlPct != null && mgmtConfig.stopLossPct != null && currentPnlPct <= mgmtConfig.stopLossPct) {
+  // Guard against API noise on fresh positions: extreme PnL (<-90%) within
+  // 2 minutes of deploy is almost always a settlement lag, not real loss.
+  const ageMinutes = pos.deployed_at
+    ? (Date.now() - new Date(pos.deployed_at).getTime()) / 60000
+    : null;
+  const freshAndExtreme = ageMinutes != null && ageMinutes < 5 && currentPnlPct != null && currentPnlPct < -90;
+  if (freshAndExtreme) {
+    log("state", `Position ${position_address} fresh (${ageMinutes.toFixed(1)}m) with extreme PnL ${currentPnlPct.toFixed(2)}% — treating as API noise`);
+  }
+
+  if (!pnl_pct_suspicious && !freshAndExtreme && currentPnlPct != null && mgmtConfig.stopLossPct != null && currentPnlPct <= mgmtConfig.stopLossPct) {
     return {
       action: "STOP_LOSS",
       reason: `Stop loss: PnL ${currentPnlPct.toFixed(2)}% <= ${mgmtConfig.stopLossPct}%`,
@@ -428,7 +438,7 @@ export function updatePnlAndCheckExits(position_address, positionData, mgmtConfi
   }
 
   // ── Trailing TP ────────────────────────────────────────────────
-  if (!pnl_pct_suspicious && pos.trailing_active) {
+  if (!pnl_pct_suspicious && !freshAndExtreme && pos.trailing_active) {
     const dropFromPeak = pos.peak_pnl_pct - currentPnlPct;
     if (dropFromPeak >= mgmtConfig.trailingDropPct) {
       return {

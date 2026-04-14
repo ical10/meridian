@@ -840,9 +840,10 @@ function getDeterministicCloseRule(position, managementConfig) {
   const pnlSuspect = (() => {
     if (position.pnl_pct == null) return false;
     if (position.pnl_pct > -90) return false;
-    // Fresh positions (< 2 min) with extreme PnL are almost always API noise
-    const ageMinutes = position.age_minutes ?? (tracked?.opened_at ? (Date.now() - new Date(tracked.opened_at).getTime()) / 60000 : null);
-    if (ageMinutes != null && ageMinutes < 2) {
+    // Fresh positions (< 5 min) with extreme PnL are almost always API noise
+    // (LPAgent/Meteora indexer routinely takes 3-5m to see new deposits)
+    const ageMinutes = position.age_minutes ?? (tracked?.deployed_at ? (Date.now() - new Date(tracked.deployed_at).getTime()) / 60000 : null);
+    if (ageMinutes != null && ageMinutes < 5) {
       log("cron_warn", `Suspect PnL for ${position.pair}: ${position.pnl_pct}% at only ${ageMinutes.toFixed(1)}m old — skipping PnL rules`);
       return true;
     }
