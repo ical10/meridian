@@ -21,7 +21,7 @@ import { getWeightsSummary } from "./signal-weights.js";
 import { bootstrapHiveMind, ensureAgentId, getHiveMindPullMode, isHiveMindEnabled, pullHiveMindLessons, pullHiveMindPresets, registerHiveMindAgent, startHiveMindBackgroundSync } from "./hivemind.js";
 import { appendDecision } from "./decision-log.js";
 import { confirmIndicatorPreset } from "./tools/chart-indicators.js";
-import { buildCandidateBlock, sanitizeUntrustedPromptText as _pureSanitize } from "./screening-prompt.js";
+import { buildCandidateBlock, buildVetoPrompt, sanitizeUntrustedPromptText as _pureSanitize } from "./screening-prompt.js";
 
 log("startup", "DLMM LP Agent starting...");
 log("startup", `Mode: ${process.env.DRY_RUN === "true" ? "DRY RUN" : "LIVE"}`);
@@ -521,17 +521,16 @@ export async function runScreeningCycle({ silent = false } = {}) {
       return screenReport;
     }
 
-    // Pre-fetch active_bin for all passing candidates in parallel
-    const activeBinResults = await Promise.allSettled(
-      passing.map(({ pool }) => getActiveBin({ pool_address: pool.pool }))
-    );
+    // ── Score-first veto flow ─────────────────────────────────────────
+    // passing[] is already pre-sorted by scoreCandidate (tools/screening.js).
+    // We send ONLY the top-1 candidate to the LLM and ask for a deploy-or-reject
+    // decision. The LLM no longer picks among N — its job is a judgment veto on
+    // the deterministic scorer's top choice.
 
-    // Build compact candidate blocks
-    const candidateBlocks = passing.map(({ pool, sw, n, ti, mem }, i) => {
-      const activeBin = activeBinResults[i]?.status === "fulfilled" ? activeBinResults[i].value?.binId : null;
-
-      // Stage signals for Darwinian weighting — captured before LLM decides
-      if (config.darwin?.enabled) {
+    // Stage signals for Darwinian weighting across all passing candidates
+    // (unchanged — signal capture is independent of deploy decision).
+    if (config.darwin?.enabled) {
+      for (const { pool, sw, n, ti } of passing) {
         stageSignals(pool.pool, {
           organic_score:         pool.organic_score         ?? null,
           fee_tvl_ratio:         pool.fee_active_tvl_ratio  ?? null,
@@ -543,49 +542,52 @@ export async function runScreeningCycle({ silent = false } = {}) {
           volatility:            pool.volatility            ?? null,
         });
       }
+    }
 
-      return buildCandidateBlock({ pool, sw, n, ti, mem, activeBin });
+    // Select top-1 (highest-scored survivor of hard filters).
+    const selected = passing[0];
+    // Fetch active_bin only for the selected candidate.
+    const activeBinResult = await getActiveBin({ pool_address: selected.pool.pool }).catch(() => null);
+    const selectedActiveBin = activeBinResult?.binId ?? null;
+    const selectedBlock = buildCandidateBlock({
+      pool: selected.pool,
+      sw: selected.sw,
+      n: selected.n,
+      ti: selected.ti,
+      mem: selected.mem,
+      activeBin: selectedActiveBin,
     });
 
-    const weightsSummary = config.darwin?.enabled ? getWeightsSummary() : null;
+    const vetoPrompt = buildVetoPrompt({
+      candidateBlock: selectedBlock,
+      strategyBlock,
+      walletInfo: {
+        solBalance: currentBalance.sol,
+        positions: prePositions.total_positions,
+        maxPositions: config.risk.maxPositions,
+        deployAmount,
+      },
+    });
 
-    const { content } = await agentLoop(`
-SCREENING CYCLE
-${strategyBlock}
-Positions: ${prePositions.total_positions}/${config.risk.maxPositions} | SOL: ${currentBalance.sol.toFixed(3)} | Deploy: ${deployAmount} SOL
-
-PRE-LOADED CANDIDATES (${passing.length} pools):
-${candidateBlocks.join("\n\n")}
-
-STEPS:
-1. Pick the best candidate (metrics, smart wallets, narrative).
-2. Call deploy_position (active_bin is pre-fetched above).
-   bins_below = round(35 + (volatility/5)*55) clamped to [35,90].
-   Single-side SOL: amount_y only, amount_x=0, bins_above=0.
-3. Report on success:
-🚀 DEPLOYED <pool name> (<pool address>)
-◎ <amount> SOL | <strategy> | bin <active_bin>
-Range cover: <range_coverage.downside_pct>% down / <range_coverage.upside_pct>% up (use tool result, don't compute)
-Fee/TVL: <x>% | Vol: $<x> | TVL: $<x> | Volatility: <x> | Organic: <x> | Mcap: $<x>
-Top10: <x>% | Bots: <x>% | Fees: <x> SOL | Smart wallets: <names or none>
-OKX: <risk flags if present, else "unavailable">
-Why: <1-2 sentences>
-
-4. If nothing qualifies, report:
-⛔ NO DEPLOY
-Best: <name or none>
-Why: <1-2 sentences>
-Rejected: <flat list of names with 1-phrase reasons>
-      `, config.llm.maxSteps, [], "SCREENER", config.llm.screeningModel, 2048, {
+    const { content } = await agentLoop(
+      vetoPrompt,
+      config.llm.maxSteps,
+      [],
+      "SCREENER",
+      config.llm.screeningModel,
+      2048,
+      {
         onToolStart: async ({ name }) => { await liveMessage?.toolStart(name); },
         onToolFinish: async ({ name, result, success }) => { await liveMessage?.toolFinish(name, result, success); },
-      });
+      }
+    );
     screenReport = content;
-    if (/⛔\s*NO DEPLOY/i.test(content)) {
+    // Log the rejection so future cycles can tell us what the LLM vetoed and why.
+    if (/⛔\s*REJECT/i.test(content)) {
       appendDecision({
         type: "no_deploy",
         actor: "SCREENER",
-        summary: "LLM chose no deploy",
+        summary: `LLM vetoed top pick: ${selected.pool.name}`,
         reason: stripThink(content).slice(0, 500),
       });
     }

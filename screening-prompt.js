@@ -88,3 +88,39 @@ export function buildCandidateBlock({ pool, sw, n, ti, mem, activeBin }) {
     mem ? `  memory_untrusted: ${sanitizeUntrustedPromptText(mem, 200)}` : null,
   ].filter(Boolean).join("\n");
 }
+
+/**
+ * Build the veto-mode screening prompt.
+ *
+ * The deterministic scorer has already picked the top candidate; we present
+ * just that one candidate to the LLM and ask for a DEPLOY-or-REJECT decision
+ * with a concrete reason. This is dramatically smaller than the old
+ * pick-among-5 prompt because (a) only one candidate block is included and
+ * (b) the output template is a single line in either direction.
+ *
+ * @param {object} args
+ * @param {string} args.candidateBlock - output of buildCandidateBlock for the top pick
+ * @param {string} args.strategyBlock  - human-readable active-strategy summary
+ * @param {object} args.walletInfo     - { solBalance, positions, maxPositions, deployAmount }
+ * @returns {string}
+ */
+export function buildVetoPrompt({ candidateBlock, strategyBlock, walletInfo }) {
+  const { solBalance, positions, maxPositions, deployAmount } = walletInfo;
+  return `SCREENING DECISION — TOP CANDIDATE (score-ranked)
+${strategyBlock}
+Wallet: ${solBalance.toFixed(3)} SOL | Positions: ${positions}/${maxPositions} | Deploy: ${deployAmount} SOL
+
+CANDIDATE:
+${candidateBlock}
+
+TASK: Decide whether to deploy into this pool right now. The deterministic scorer already picked it; your job is the judgment veto — reject only on substantive red flags visible above (bad pool memory, rug-pattern narrative, late-cycle ATH, suspicious cluster activity, etc.). Don't reject on mild concerns.
+
+If YES, call deploy_position using:
+  bins_below = round(35 + (volatility/5)*55) clamped to [35,90]
+  Single-side SOL: amount_y only, amount_x=0, bins_above=0
+Then report exactly one line:
+🚀 DEPLOYED <name> | ◎ <amount> SOL | <strategy> | bin <active_bin> | Fee/TVL: <x>% | Why: <1 sentence>
+
+If NO, do NOT call any tool. Return exactly one line:
+⛔ REJECT <name>: <specific concrete reason>`;
+}
