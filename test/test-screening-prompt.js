@@ -10,7 +10,7 @@
  * Exits non-zero if the total prompt body exceeds BUDGET_TOKENS.
  */
 
-import { buildCandidateBlock } from "../screening-prompt.js";
+import { buildCandidateBlock, buildVetoPrompt } from "../screening-prompt.js";
 
 // Approximate tokenizer: OpenAI-family models average ~4 chars per token for English.
 // Not exact but close enough to catch regressions.
@@ -175,3 +175,50 @@ if (totalTokens > BUDGET_TOKENS) {
 }
 
 console.log(`\n✅ PASS: total body ~${totalTokens} tokens within ${BUDGET_TOKENS} budget`);
+
+// ── Phase 2: veto prompt (top-1) ─────────────────────────────────────
+
+console.log("\n\n=== Veto prompt (top-1 only) ===");
+
+const VETO_BUDGET_TOKENS = 800;
+
+const vetoPrompt = buildVetoPrompt({
+  candidateBlock: blocks[0],
+  strategyBlock:
+    "ACTIVE STRATEGY: Tight Sniper v1 — LP: spot | bins_above: 0 (FIXED — never change) | deposit: SOL only — call deploy_position with amount_y only, keep amount_x=0 | best for: High-volatility new launches",
+  walletInfo: {
+    solBalance: 2.918,
+    positions: 0,
+    maxPositions: 3,
+    deployAmount: 0.8,
+  },
+});
+const vetoTokens = approxTokens(vetoPrompt);
+
+console.log(`Veto prompt: ${vetoPrompt.length} chars  ~${vetoTokens} tokens`);
+console.log(`Budget:      ${VETO_BUDGET_TOKENS} tokens\n`);
+console.log("--- Veto prompt body ---");
+console.log(vetoPrompt);
+console.log("--- end veto prompt ---\n");
+
+// The veto prompt must mention both the DEPLOY and REJECT paths explicitly.
+if (!/🚀 DEPLOYED/.test(vetoPrompt)) {
+  console.error("❌ FAIL: veto prompt missing 🚀 DEPLOYED example");
+  process.exit(1);
+}
+if (!/⛔ REJECT/.test(vetoPrompt)) {
+  console.error("❌ FAIL: veto prompt missing ⛔ REJECT example");
+  process.exit(1);
+}
+// Bin formula must be present so the LLM knows how to compute bins_below.
+if (!/bins_below = round\(35 \+ \(volatility\/5\)\*55\)/.test(vetoPrompt)) {
+  console.error("❌ FAIL: veto prompt missing bin formula");
+  process.exit(1);
+}
+
+if (vetoTokens > VETO_BUDGET_TOKENS) {
+  console.error(`❌ FAIL: veto prompt ${vetoTokens} tokens exceeds budget ${VETO_BUDGET_TOKENS}`);
+  process.exit(1);
+}
+
+console.log(`✅ PASS: veto prompt ~${vetoTokens} tokens within ${VETO_BUDGET_TOKENS} budget`);

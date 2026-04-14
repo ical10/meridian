@@ -131,6 +131,71 @@ console.log("\n=== NO DEPLOY sample 2 ===");
   assert(p.why && p.why.length > 10, "why explanation present");
 }
 
+// ── Phase 2 output shapes: single-line DEPLOYED + REJECT ─────────────
+
+const DEPLOYED_ONELINE_1 =
+  "🚀 DEPLOYED TestToken-SOL | ◎ 0.8 SOL | spot | bin -1234 | Fee/TVL: 0.12% | Why: Strong organic + sustained volume with clean audit.";
+
+const DEPLOYED_ONELINE_2 =
+  "🚀 DEPLOYED SIZE-SOL | ◎ 1.0 SOL | bid_ask | bin -507 | Fee/TVL: 0.18% | Why: Smart wallets present and rising fee/TVL ratio.";
+
+const REJECT_SAMPLE_1 =
+  "⛔ REJECT CHIBI-SOL: Pool memory shows 3 of last 4 deploys closed within 15 min at negative PnL.";
+
+const REJECT_SAMPLE_2 =
+  "⛔ REJECT BULL-SOL: Narrative indicates dev sold all tokens with no community takeover signal; classic rug pattern.";
+
+function parseOnelineDeployed(text) {
+  const m = text.match(/🚀\s*DEPLOYED\s+(\S+)\s*\|\s*◎\s*([\d.]+)\s*SOL\s*\|\s*(\w+)\s*\|\s*bin\s*(-?\d+)\s*\|\s*Fee\/TVL:\s*([\d.]+)%\s*\|\s*Why:\s*(.+)/);
+  if (!m) return null;
+  return {
+    poolName:  m[1],
+    amount:    parseFloat(m[2]),
+    strategy:  m[3],
+    activeBin: parseInt(m[4]),
+    feeTvl:    parseFloat(m[5]),
+    why:       m[6].trim(),
+  };
+}
+
+function parseReject(text) {
+  const m = text.match(/⛔\s*REJECT\s+(\S+):\s*(.+)/);
+  if (!m) return null;
+  return { poolName: m[1], reason: m[2].trim() };
+}
+
+console.log("\n=== Phase 2 single-line DEPLOYED sample 1 ===");
+{
+  const p = parseOnelineDeployed(DEPLOYED_ONELINE_1);
+  assert(p && p.poolName === "TestToken-SOL", "single-line deployed: pool name parsed");
+  assert(p && p.amount === 0.8, "single-line deployed: amount parsed");
+  assert(p && p.strategy === "spot", "single-line deployed: strategy parsed");
+  assert(p && p.activeBin === -1234, "single-line deployed: active bin parsed");
+  assert(p && p.feeTvl === 0.12, "single-line deployed: fee/TVL parsed");
+  assert(p && p.why && p.why.length > 10, "single-line deployed: why parsed");
+}
+
+console.log("\n=== Phase 2 single-line DEPLOYED sample 2 ===");
+{
+  const p = parseOnelineDeployed(DEPLOYED_ONELINE_2);
+  assert(p && p.strategy === "bid_ask", "bid_ask strategy parsed");
+  assert(p && p.amount === 1.0, "1.0 SOL amount parsed");
+}
+
+console.log("\n=== REJECT sample 1 ===");
+{
+  const r = parseReject(REJECT_SAMPLE_1);
+  assert(r && r.poolName === "CHIBI-SOL", "reject: pool name parsed");
+  assert(r && r.reason.length > 15, "reject: concrete reason present (>15 chars)");
+}
+
+console.log("\n=== REJECT sample 2 ===");
+{
+  const r = parseReject(REJECT_SAMPLE_2);
+  assert(r && r.poolName === "BULL-SOL", "reject: pool name parsed");
+  assert(r && /dev sold/i.test(r.reason), "reject: reason contains specific detail");
+}
+
 console.log();
 if (failures > 0) {
   console.error(`❌ FAIL: ${failures} assertion(s) failed`);
