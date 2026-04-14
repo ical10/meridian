@@ -13,6 +13,8 @@
     "dev": "DRY_RUN=true node index.js",
     "test:screen": "node test/test-screening.js",
     "test:agent": "DRY_RUN=true node test/test-agent.js",
+    "test:prompt": "node test/test-screening-prompt.js",
+    "test:prompt-shapes": "node test/test-prompt-shapes.js",
     "postinstall": "node scripts/patch-anchor.js"
   },
   "dependencies": {
