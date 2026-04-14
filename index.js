@@ -444,8 +444,18 @@ export async function runScreeningCycle({ silent = false } = {}) {
 
     // Load active strategy
     const activeStrategy = getActiveStrategy();
+    const singleSide = activeStrategy?.entry?.single_side;
+    const depositInstruction = (() => {
+      if (singleSide === "sol") {
+        return "SOL only — call deploy_position with amount_y only, keep amount_x=0";
+      }
+      if (singleSide === "token") {
+        return "TOKEN ONLY — you MUST call swap_token FIRST to convert SOL → base token, THEN call deploy_position with amount_x set to the swapped quantity and amount_y=0. Never try to deploy without acquiring the base token first.";
+      }
+      return "dual-sided — both amount_x and amount_y required; call swap_token first if you lack the base token";
+    })();
     const strategyBlock = activeStrategy
-      ? `ACTIVE STRATEGY: ${activeStrategy.name} — LP: ${activeStrategy.lp_strategy} | bins_above: ${activeStrategy.range?.bins_above ?? 0} (FIXED — never change) | deposit: ${activeStrategy.entry?.single_side === "sol" ? "SOL only (amount_y, amount_x=0)" : "dual-sided"} | best for: ${activeStrategy.best_for}`
+      ? `ACTIVE STRATEGY: ${activeStrategy.name} — LP: ${activeStrategy.lp_strategy} | bins_above: ${activeStrategy.range?.bins_above ?? 0} (FIXED — never change) | deposit: ${depositInstruction} | best for: ${activeStrategy.best_for}`
       : `No active strategy — use default bid_ask, bins_above: 0, SOL only.`;
 
     // Fetch top candidates, then recon each sequentially with a small delay to avoid 429s
