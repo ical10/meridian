@@ -805,11 +805,19 @@ Summarize the current portfolio health, total fees earned, and performance of al
             }
             continue;
           }
+          // Catastrophic exits (STOP_LOSS, STALE_LOSER) MUST bypass the
+          // management-cycle cooldown — otherwise the poller detects the
+          // breach but waits 5 minutes for management to be allowed to run,
+          // and the position keeps bleeding past the threshold during the
+          // wait. Real-world incident on 2026-04-27: HENRY-SOL stop-loss
+          // fired at -16% but actual close didn't happen until -22% because
+          // the poller's request was blocked by cooldown for ~5 min.
+          const isUrgent = exit.action === "STOP_LOSS" || exit.action === "STALE_LOSER";
           const cooldownMs = config.schedule.managementIntervalMin * 60 * 1000;
           const sinceLastTrigger = Date.now() - _pollTriggeredAt;
-          if (sinceLastTrigger >= cooldownMs) {
+          if (isUrgent || sinceLastTrigger >= cooldownMs) {
             _pollTriggeredAt = Date.now();
-            log("state", `[PnL poll] Exit alert: ${p.pair} — ${exit.reason} — triggering management`);
+            log("state", `[PnL poll] ${isUrgent ? "URGENT " : ""}Exit alert: ${p.pair} — ${exit.reason} — triggering management`);
             runManagementCycle({ silent: true }).catch((e) => log("cron_error", `Poll-triggered management failed: ${e.message}`));
           } else {
             log("state", `[PnL poll] Exit alert: ${p.pair} — ${exit.reason} — cooldown (${Math.round((cooldownMs - sinceLastTrigger) / 1000)}s left)`);
