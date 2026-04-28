@@ -180,7 +180,15 @@ export const config = {
     repeatDeployCooldownHours: u.repeatDeployCooldownHours ?? 12,
     repeatDeployCooldownScope: u.repeatDeployCooldownScope ?? "token", // pool | token | both
     repeatDeployCooldownMinFeeEarnedPct: u.repeatDeployCooldownMinFeeEarnedPct ?? u.repeatDeployCooldownMinFeeYieldPct ?? 0,
-    recentLossCooldownPct:    u.recentLossCooldownPct    ?? -3,  // any close with PnL <= this triggers pool+token cooldown
+    // Severity-scaled cooldown after a losing close: array of [pctThreshold, hours]
+    // sorted most-severe-first. First match wins. Default lifts cooldown durations
+    // for deep losses where the data showed token-camping fails catastrophically.
+    recentLossCooldownTiers: Array.isArray(u.recentLossCooldownTiers)
+      ? u.recentLossCooldownTiers
+      : [[-20, 168], [-10, 72], [-5, 24], [-3, 4]],
+    // Legacy flat-cooldown keys kept for backward compatibility — only consulted
+    // if recentLossCooldownTiers is unset/empty.
+    recentLossCooldownPct:    u.recentLossCooldownPct    ?? -3,
     recentLossCooldownHours:  u.recentLossCooldownHours  ?? 4,
     minVolumeToRebalance:  u.minVolumeToRebalance  ?? 1000,
     stopLossPct:           u.stopLossPct           ?? u.emergencyPriceDropPct ?? -50,

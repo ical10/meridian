@@ -176,23 +176,44 @@ export function recordPoolDeploy(poolAddress, deployData) {
     log("pool-memory", `Cooldown set for ${entry.name} until ${cooldownUntil} (low yield close)`);
   }
 
-  // Recent-loss cooldown: any deploy that closed with PnL <= recentLossCooldownPct
-  // triggers a cooldown on BOTH the pool and the base mint. Without this, a
-  // pattern like unc-SOL today emerged: bot kept redeploying to the same pool,
-  // collecting +$0.10 micro-wins, then one cycle hit -8% and erased 50+ wins.
-  // The existing repeatDeployCooldown only fires on winning streaks (every
-  // recent deploy positive) — exactly the wrong signal for the failure mode
-  // we're seeing. This rule fires on the loss directly, regardless of streak.
-  const lossThreshold = Number(config.management.recentLossCooldownPct ?? -3);
-  const lossCooldownHours = Math.max(0, Number(config.management.recentLossCooldownHours ?? 4));
-  if (lossCooldownHours > 0 && deploy.pnl_pct != null && deploy.pnl_pct <= lossThreshold) {
-    const reason = `recent loss ${deploy.pnl_pct.toFixed(2)}% <= ${lossThreshold}%`;
-    const poolCooldownUntil = setPoolCooldown(entry, lossCooldownHours, reason);
-    log("pool-memory", `Cooldown set for ${entry.name} until ${poolCooldownUntil} (${reason})`);
-    if (entry.base_mint) {
-      const mintCooldownUntil = setBaseMintCooldown(db, entry.base_mint, lossCooldownHours, reason);
-      if (mintCooldownUntil) {
-        log("pool-memory", `Base mint cooldown set for ${entry.base_mint.slice(0, 8)} until ${mintCooldownUntil} (${reason})`);
+  // Escalating recent-loss cooldown: severity-scaled lockout on both the pool
+  // and the base mint. Small dips get a short pause; deep losses lock the
+  // token out for days because the asymmetric-risk pattern proven by per-token
+  // history (WIZ −$7 net across 6 wins + 1 nuke; HENRY −$14 across 4 wins + 1
+  // nuke; Patapim −$6 across 3 wins + 1 nuke) makes camping unsustainable
+  // after any meaningful loss.
+  //
+  // Tunable via management.recentLossCooldownTiers (array of [pctThreshold, hours]).
+  // Default tiers (most-severe-first; first match wins):
+  //   <= -20% → 168h (7 days)
+  //   <= -10% → 72h
+  //   <= -5%  → 24h
+  //   <= -3%  → 4h
+  const defaultLossTiers = [
+    [-20, 168],
+    [-10, 72],
+    [-5,  24],
+    [-3,   4],
+  ];
+  const lossTiers = Array.isArray(config.management.recentLossCooldownTiers)
+    && config.management.recentLossCooldownTiers.length > 0
+    ? config.management.recentLossCooldownTiers
+    : defaultLossTiers;
+  if (deploy.pnl_pct != null) {
+    const matched = lossTiers.find(([pctMax]) => deploy.pnl_pct <= pctMax);
+    if (matched) {
+      const [pctMax, hours] = matched;
+      const cooldownHours = Math.max(0, Number(hours));
+      if (cooldownHours > 0) {
+        const reason = `recent loss ${deploy.pnl_pct.toFixed(2)}% <= ${pctMax}% → ${cooldownHours}h cooldown`;
+        const poolCooldownUntil = setPoolCooldown(entry, cooldownHours, reason);
+        log("pool-memory", `Cooldown set for ${entry.name} until ${poolCooldownUntil} (${reason})`);
+        if (entry.base_mint) {
+          const mintCooldownUntil = setBaseMintCooldown(db, entry.base_mint, cooldownHours, reason);
+          if (mintCooldownUntil) {
+            log("pool-memory", `Base mint cooldown set for ${entry.base_mint.slice(0, 8)} until ${mintCooldownUntil} (${reason})`);
+          }
+        }
       }
     }
   }
