@@ -307,6 +307,7 @@ const toolMap = {
       minQuoteOrganic: ["screening", "minQuoteOrganic"],
       minHolders: ["screening", "minHolders"],
       minMcap: ["screening", "minMcap"],
+      maxPriceChangePct: ["screening", "maxPriceChangePct"],
       maxMcap: ["screening", "maxMcap"],
       minBinStep: ["screening", "minBinStep"],
       maxBinStep: ["screening", "maxBinStep"],

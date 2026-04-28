@@ -92,6 +92,7 @@ export const config = {
     minQuoteOrganic:   u.minQuoteOrganic   ?? 60,
     minHolders:        u.minHolders        ?? 500,
     minMcap:           u.minMcap           ?? 150_000,
+    maxPriceChangePct: u.maxPriceChangePct ?? null, // null disables; X = skip pools whose price moved more than ±X% over the screening timeframe (catches post-pump knife-catches and free-falling pools)
     maxMcap:           u.maxMcap           ?? 10_000_000,
     minBinStep:        u.minBinStep        ?? 80,
     maxBinStep:        u.maxBinStep        ?? 125,

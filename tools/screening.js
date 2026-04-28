@@ -622,6 +622,19 @@ export async function getTopCandidates({ limit = 10 } = {}) {
         pushFilteredReason(filteredOut, p, "token cooldown active");
         return false;
       }
+      // Price-change filter: drops pools whose price moved more than
+      // maxPriceChangePct% (in either direction) over the screening timeframe.
+      // Catches "falling knife" entries — pools that just pumped or just dumped
+      // hard. Real-world cost (2026-04-27): HENRY-SOL was +25% on 1h at deploy
+      // and bled -22% within hours. Without this filter we kept catching tops.
+      const maxPct = config.screening.maxPriceChangePct;
+      const poolChange = p.pool_price_change_pct;
+      if (maxPct != null && Number.isFinite(poolChange) && Math.abs(poolChange) > maxPct) {
+        const direction = poolChange > 0 ? "pumped" : "dumped";
+        log("screening", `Filtered ${p.name} — ${direction} ${poolChange.toFixed(1)}% over ${config.screening.timeframe} (cap ±${maxPct}%)`);
+        pushFilteredReason(filteredOut, p, `${direction} ${poolChange.toFixed(1)}% > ±${maxPct}%`);
+        return false;
+      }
       return true;
     })
     .sort((a, b) => scoreCandidate(b) - scoreCandidate(a))
