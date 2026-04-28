@@ -176,6 +176,27 @@ export function recordPoolDeploy(poolAddress, deployData) {
     log("pool-memory", `Cooldown set for ${entry.name} until ${cooldownUntil} (low yield close)`);
   }
 
+  // Recent-loss cooldown: any deploy that closed with PnL <= recentLossCooldownPct
+  // triggers a cooldown on BOTH the pool and the base mint. Without this, a
+  // pattern like unc-SOL today emerged: bot kept redeploying to the same pool,
+  // collecting +$0.10 micro-wins, then one cycle hit -8% and erased 50+ wins.
+  // The existing repeatDeployCooldown only fires on winning streaks (every
+  // recent deploy positive) — exactly the wrong signal for the failure mode
+  // we're seeing. This rule fires on the loss directly, regardless of streak.
+  const lossThreshold = Number(config.management.recentLossCooldownPct ?? -3);
+  const lossCooldownHours = Math.max(0, Number(config.management.recentLossCooldownHours ?? 4));
+  if (lossCooldownHours > 0 && deploy.pnl_pct != null && deploy.pnl_pct <= lossThreshold) {
+    const reason = `recent loss ${deploy.pnl_pct.toFixed(2)}% <= ${lossThreshold}%`;
+    const poolCooldownUntil = setPoolCooldown(entry, lossCooldownHours, reason);
+    log("pool-memory", `Cooldown set for ${entry.name} until ${poolCooldownUntil} (${reason})`);
+    if (entry.base_mint) {
+      const mintCooldownUntil = setBaseMintCooldown(db, entry.base_mint, lossCooldownHours, reason);
+      if (mintCooldownUntil) {
+        log("pool-memory", `Base mint cooldown set for ${entry.base_mint.slice(0, 8)} until ${mintCooldownUntil} (${reason})`);
+      }
+    }
+  }
+
   const oorTriggerCount = config.management.oorCooldownTriggerCount ?? 3;
   const oorCooldownHours = config.management.oorCooldownHours ?? 12;
   const recentDeploys = entry.deploys.slice(-oorTriggerCount);

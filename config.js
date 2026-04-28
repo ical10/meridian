@@ -180,6 +180,8 @@ export const config = {
     repeatDeployCooldownHours: u.repeatDeployCooldownHours ?? 12,
     repeatDeployCooldownScope: u.repeatDeployCooldownScope ?? "token", // pool | token | both
     repeatDeployCooldownMinFeeEarnedPct: u.repeatDeployCooldownMinFeeEarnedPct ?? u.repeatDeployCooldownMinFeeYieldPct ?? 0,
+    recentLossCooldownPct:    u.recentLossCooldownPct    ?? -3,  // any close with PnL <= this triggers pool+token cooldown
+    recentLossCooldownHours:  u.recentLossCooldownHours  ?? 4,
     minVolumeToRebalance:  u.minVolumeToRebalance  ?? 1000,
     stopLossPct:           u.stopLossPct           ?? u.emergencyPriceDropPct ?? -50,
     takeProfitPct:         u.takeProfitPct         ?? u.takeProfitFeePct ?? 5,
