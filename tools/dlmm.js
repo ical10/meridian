@@ -1,4 +1,5 @@
 import {
+  ComputeBudgetProgram,
   Connection,
   Keypair,
   PublicKey,
@@ -95,6 +96,67 @@ function getWallet() {
     log("init", `Wallet: ${_wallet.publicKey.toString()}`);
   }
   return _wallet;
+}
+
+/**
+ * Prepend ComputeBudgetProgram instructions to a Transaction so it
+ * gets prioritized during network congestion.
+ *
+ * Real-world cost (2026-05-02): MOGMAN-SOL stop-loss tx with default
+ * priority fee = 0 expired ("block height exceeded") during a rug.
+ * By the retry, position had decayed from -14.75% to -82.65% PnL.
+ *
+ * Only mutates legacy Transaction objects. VersionedTransactions are
+ * left alone (they need different handling and aren't on the close path).
+ */
+function addPriorityFee(tx, microLamports) {
+  if (!tx || tx.constructor?.name === "VersionedTransaction") return tx;
+  if (!Array.isArray(tx.instructions)) return tx;
+  // Avoid double-adding if the SDK already inserted compute budget ixs
+  const hasCBP = tx.instructions.some(
+    (ix) => ix.programId?.toString?.() === ComputeBudgetProgram.programId.toString()
+  );
+  if (hasCBP) return tx;
+  const priceIx = ComputeBudgetProgram.setComputeUnitPrice({ microLamports });
+  const limitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 });
+  tx.instructions.unshift(priceIx, limitIx);
+  return tx;
+}
+
+/**
+ * Send a transaction with retry on blockhash-expiry. On expiry, refresh
+ * blockhash and double the priority fee (up to a cap) before retrying.
+ *
+ * Designed for stop-loss / urgent-exit transactions where a delayed close
+ * can be far worse than a higher fee.
+ */
+async function sendWithExpiryRetry(tx, signers, { initialFee = 100_000, maxAttempts = 3, label = "tx" } = {}) {
+  const conn = getConnection();
+  let fee = initialFee;
+  let lastErr;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      // Fresh blockhash + priority fee on every attempt (mutates tx)
+      const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash("confirmed");
+      tx.recentBlockhash = blockhash;
+      tx.lastValidBlockHeight = lastValidBlockHeight;
+      tx.feePayer = signers[0].publicKey;
+      // Reset signatures since blockhash changed
+      tx.signatures = [];
+      addPriorityFee(tx, fee);
+      const sig = await sendAndConfirmTransaction(conn, tx, signers);
+      if (attempt > 1) log("close", `${label}: succeeded on attempt ${attempt} with priority fee ${fee} µLam/CU`);
+      return sig;
+    } catch (e) {
+      lastErr = e;
+      const msg = String(e?.message || e);
+      const expired = /block height exceeded|blockhash not found|expired/i.test(msg);
+      if (!expired || attempt === maxAttempts) throw e;
+      log("close_warn", `${label}: tx expired (attempt ${attempt}/${maxAttempts}, fee ${fee} µLam/CU) — retrying with higher fee`);
+      fee = Math.min(fee * 2, 2_000_000); // cap at 2M µLam/CU
+    }
+  }
+  throw lastErr;
 }
 
 function getMeridianApiBase() {
@@ -1586,7 +1648,10 @@ export async function claimFees({ position_address }) {
 
     const txHashes = [];
     for (const tx of txs) {
-      const txHash = await sendAndConfirmTransaction(getConnection(), tx, [wallet]);
+      const txHash = await sendWithExpiryRetry(tx, [wallet], {
+        initialFee: config.management?.claimPriorityFeeMicrolamports ?? 50_000,
+        label: `claim ${position_address?.slice(0, 8)}`,
+      });
       txHashes.push(txHash);
     }
     log("claim", `SUCCESS txs: ${txHashes.join(", ")}`);
@@ -1862,7 +1927,10 @@ export async function closePosition({ position_address, reason }) {
         });
         if (claimTxs && claimTxs.length > 0) {
           for (const tx of claimTxs) {
-            const claimHash = await sendAndConfirmTransaction(getConnection(), tx, [wallet]);
+            const claimHash = await sendWithExpiryRetry(tx, [wallet], {
+              initialFee: config.management?.closePriorityFeeMicrolamports ?? 100_000,
+              label: `claim-on-close ${position_address?.slice(0, 8)}`,
+            });
             claimTxHashes.push(claimHash);
           }
           log("close", `Step 1 OK (claim only): ${claimTxHashes.join(", ")}`);
@@ -1901,7 +1969,10 @@ export async function closePosition({ position_address, reason }) {
       });
 
       for (const tx of Array.isArray(closeTx) ? closeTx : [closeTx]) {
-        const txHash = await sendAndConfirmTransaction(getConnection(), tx, [wallet]);
+        const txHash = await sendWithExpiryRetry(tx, [wallet], {
+          initialFee: config.management?.closePriorityFeeMicrolamports ?? 100_000,
+          label: `close ${position_address?.slice(0, 8)}`,
+        });
         closeTxHashes.push(txHash);
       }
     } else {
@@ -1910,7 +1981,10 @@ export async function closePosition({ position_address, reason }) {
         owner: wallet.publicKey,
         position: { publicKey: positionPubKey },
       });
-      const txHash = await sendAndConfirmTransaction(getConnection(), closeTx, [wallet]);
+      const txHash = await sendWithExpiryRetry(closeTx, [wallet], {
+        initialFee: config.management?.closePriorityFeeMicrolamports ?? 100_000,
+        label: `close ${position_address?.slice(0, 8)}`,
+      });
       closeTxHashes.push(txHash);
     }
     const txHashes = [...claimTxHashes, ...closeTxHashes];

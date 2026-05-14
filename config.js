@@ -93,6 +93,7 @@ export const config = {
     minHolders:        u.minHolders        ?? 500,
     minMcap:           u.minMcap           ?? 150_000,
     maxPriceChangePct: u.maxPriceChangePct ?? null, // null disables; X = skip pools whose price moved more than ±X% over the screening timeframe (catches post-pump knife-catches and free-falling pools)
+    maxHourlyDumpPct:  u.maxHourlyDumpPct  ?? null, // null disables; X = skip pools dumping more than X% over 1h (catches falling-knife entries — MOGMAN had -25% 1h drop at deploy)
     maxMcap:           u.maxMcap           ?? 10_000_000,
     minBinStep:        u.minBinStep        ?? 80,
     maxBinStep:        u.maxBinStep        ?? 125,
@@ -170,6 +171,13 @@ export const config = {
 
   // ─── Position Management ────────────────
   management: {
+    // Priority fees (in microlamports per compute unit) prepended to close
+    // and claim transactions. Default 100k µLam/CU on close ≈ ~$0.01–0.04
+    // per tx but dramatically improves landing rate during congestion/rugs.
+    // Real-world: MOGMAN-SOL stop-loss tx with 0 priority fee expired during
+    // a rug; by retry, position decayed from -14.75% to -82.65% PnL.
+    closePriorityFeeMicrolamports: u.closePriorityFeeMicrolamports ?? 100_000,
+    claimPriorityFeeMicrolamports: u.claimPriorityFeeMicrolamports ?? 50_000,
     minClaimAmount:        u.minClaimAmount        ?? 5,
     autoSwapAfterClaim:    u.autoSwapAfterClaim    ?? false,
     outOfRangeBinsToClose: u.outOfRangeBinsToClose ?? 10,

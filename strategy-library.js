@@ -9,8 +9,11 @@
 import fs from "fs";
 import { log } from "./logger.js";
 import { repoPath } from "./repo-root.js";
+import { config } from "./config.js";
+import { CONFIG_MAP } from "./config-map.js";
 
 const STRATEGY_FILE = repoPath("strategy-library.json");
+const USER_CONFIG_PATH = repoPath("user-config.json");
 
 function load() {
   if (!fs.existsSync(STRATEGY_FILE)) return { active: null, strategies: {} };
@@ -102,7 +105,69 @@ export function getStrategy({ id }) {
 }
 
 /**
+ * Apply a strategy's config_overrides block to live config + user-config.json.
+ * Stateless merge: keys present in overrides clobber existing values; keys
+ * absent from overrides are left alone (so manual tunes for unrelated keys
+ * survive a strategy switch).
+ *
+ * Returns an array of [key, before, after] triples for logging/reporting.
+ */
+function applyConfigOverrides(overrides) {
+  if (!overrides || typeof overrides !== "object") return [];
+
+  // Read current user-config so we can persist changes
+  let userConfig = {};
+  try {
+    if (fs.existsSync(USER_CONFIG_PATH)) {
+      userConfig = JSON.parse(fs.readFileSync(USER_CONFIG_PATH, "utf8"));
+    }
+  } catch (e) {
+    log("strategy_warn", `applyConfigOverrides: failed to read user-config.json: ${e.message}`);
+  }
+
+  const changes = [];
+  for (const [key, val] of Object.entries(overrides)) {
+    const mapping = CONFIG_MAP[key];
+    if (!mapping) {
+      log("strategy_warn", `applyConfigOverrides: unknown key "${key}" — skipping`);
+      continue;
+    }
+    const [section, field, persistedPath] = mapping;
+    // Mutate live config object
+    const before = config[section]?.[field];
+    if (config[section] !== undefined) config[section][field] = val;
+    // Persist to user-config.json. If a persistedPath exists, use it; otherwise
+    // user-config.json holds the flat key directly (most common case).
+    if (Array.isArray(persistedPath)) {
+      // Nested persisted path, e.g. ["chartIndicators","enabled"]
+      let cursor = userConfig;
+      for (let i = 0; i < persistedPath.length - 1; i++) {
+        const seg = persistedPath[i];
+        if (cursor[seg] === undefined || cursor[seg] === null) cursor[seg] = {};
+        cursor = cursor[seg];
+      }
+      cursor[persistedPath[persistedPath.length - 1]] = val;
+    } else {
+      userConfig[key] = val;
+    }
+    changes.push([key, before, val]);
+  }
+
+  // Persist user-config.json if anything changed
+  if (changes.length > 0) {
+    try {
+      fs.writeFileSync(USER_CONFIG_PATH, JSON.stringify(userConfig, null, 2));
+    } catch (e) {
+      log("strategy_warn", `applyConfigOverrides: failed to write user-config.json: ${e.message}`);
+    }
+  }
+  return changes;
+}
+
+/**
  * Set the active strategy used during screening cycles.
+ * If the strategy has a `config_overrides` block, those values are applied
+ * to live config and persisted to user-config.json (clobber + stateless merge).
  */
 export function setActiveStrategy({ id }) {
   if (!id) return { error: "id required" };
@@ -111,7 +176,22 @@ export function setActiveStrategy({ id }) {
   db.active = id;
   save(db);
   log("strategy", `Active strategy set to: ${db.strategies[id].name}`);
-  return { active: id, name: db.strategies[id].name };
+
+  // Apply config_overrides if present
+  const overrides = db.strategies[id].config_overrides;
+  const changes = applyConfigOverrides(overrides);
+  if (changes.length > 0) {
+    log("strategy", `Applied ${changes.length} config_overrides for ${db.strategies[id].name}:`);
+    for (const [key, before, after] of changes) {
+      log("strategy", `  ${key}: ${JSON.stringify(before)} → ${JSON.stringify(after)}`);
+    }
+  }
+
+  return {
+    active: id,
+    name: db.strategies[id].name,
+    config_overrides_applied: changes.map(([k, b, a]) => ({ key: k, before: b, after: a })),
+  };
 }
 
 /**

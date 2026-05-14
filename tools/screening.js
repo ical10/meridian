@@ -37,7 +37,30 @@ function scoreCandidate(pool) {
   const organic = Number(pool.organic_score || 0);
   const volume = Number(pool.volume_window || 0);
   const holders = Number(pool.holders || 0);
-  return feeTvl * 1000 + organic * 10 + volume / 100 + holders / 100;
+  const reward = feeTvl * 1000 + organic * 10 + volume / 100 + holders / 100;
+
+  // Risk penalties — push rug-prone tokens down even if they have great fees.
+  // Reasoning: MOGMAN-SOL (2026-05-02) ranked #1 by reward despite 14% bundle,
+  // -25% 1h dump, no smart wallets — then rugged 10 min later for -82%.
+  let penalty = 0;
+  // Bundle concentration: anything above 5% gets penalized linearly
+  if (Number.isFinite(pool.bundle_pct) && pool.bundle_pct > 5) {
+    penalty += (pool.bundle_pct - 5) * 30;
+  }
+  // Sniper concentration: any % is risky
+  if (Number.isFinite(pool.sniper_pct) && pool.sniper_pct > 0) {
+    penalty += pool.sniper_pct * 50;
+  }
+  // 1h dump: penalize negative momentum (catches falling knives)
+  if (Number.isFinite(pool.price_change_1h) && pool.price_change_1h < 0) {
+    penalty += Math.abs(pool.price_change_1h) * 20;
+  }
+  // No KOL/smart-wallet conviction on the token: flat penalty
+  // (real winners attract alpha; rugs typically have no alpha presence)
+  if (pool.kol_in_clusters === false) {
+    penalty += 200;
+  }
+  return reward - penalty;
 }
 
 function numeric(value) {
@@ -653,8 +676,123 @@ export async function getTopCandidates({ limit = 10 } = {}) {
     }
   }
 
-  // Dev blocklist check — filter pools whose creator is on the blocklist
-  if (eligible.length > 0) {
+  // Enrich with OKX data — advanced info (risk/bundle/sniper) + ATH price (no API key required)
+  // Skipped for GMGN: bundler/bot/wash data already sourced from GMGN pipeline
+  if (source !== "gmgn" && eligible.length > 0) {
+    const { getAdvancedInfo, getPriceInfo, getClusterList, getRiskFlags } = await import("./okx.js");
+    const okxResults = await Promise.allSettled(
+      eligible.map(async (p) => {
+        if (!p.base?.mint) return { adv: null, price: null, clusters: [], risk: null };
+        const [adv, price, clusters, risk] = await Promise.allSettled([
+          getAdvancedInfo(p.base.mint),
+          getPriceInfo(p.base.mint),
+          getClusterList(p.base.mint),
+          getRiskFlags(p.base.mint),
+        ]);
+
+        const mintShort = p.base.mint.slice(0, 8);
+        if (adv.status !== "fulfilled")      log("okx", `advanced-info unavailable for ${p.name} (${mintShort})`);
+        if (price.status !== "fulfilled")    log("okx", `price-info unavailable for ${p.name} (${mintShort})`);
+        if (clusters.status !== "fulfilled") log("okx", `cluster-list unavailable for ${p.name} (${mintShort})`);
+        if (risk.status !== "fulfilled")     log("okx", `risk-check unavailable for ${p.name} (${mintShort})`);
+
+        return {
+          adv: adv.status === "fulfilled" ? adv.value : null,
+          price: price.status === "fulfilled" ? price.value : null,
+          clusters: clusters.status === "fulfilled" ? clusters.value : [],
+          risk: risk.status === "fulfilled" ? risk.value : null,
+        };
+      })
+    );
+    for (let i = 0; i < eligible.length; i++) {
+      const r = okxResults[i];
+      if (r.status !== "fulfilled") continue;
+      const { adv, price, clusters, risk } = r.value;
+      if (adv) {
+        eligible[i].risk_level      = adv.risk_level;
+        eligible[i].bundle_pct      = adv.bundle_pct;
+        eligible[i].sniper_pct      = adv.sniper_pct;
+        eligible[i].suspicious_pct  = adv.suspicious_pct;
+        eligible[i].smart_money_buy = adv.smart_money_buy;
+        eligible[i].dev_sold_all    = adv.dev_sold_all;
+        eligible[i].dex_boost       = adv.dex_boost;
+        eligible[i].dex_screener_paid = adv.dex_screener_paid;
+        if (adv.creator && !eligible[i].dev) eligible[i].dev = adv.creator;
+      }
+      if (risk) {
+        eligible[i].is_rugpull = risk.is_rugpull;
+        eligible[i].is_wash    = risk.is_wash;
+      }
+      if (price) {
+        eligible[i].price_vs_ath_pct = price.price_vs_ath_pct;
+        eligible[i].ath              = price.ath;
+        eligible[i].price_change_1h  = price.price_change_1h;
+        eligible[i].price_change_5m  = price.price_change_5m;
+      }
+      if (clusters?.length) {
+        // Surface KOL presence and top cluster trend for LLM
+        eligible[i].kol_in_clusters      = clusters.some((c) => c.has_kol);
+        eligible[i].top_cluster_trend    = clusters[0]?.trend ?? null;      // buy|sell|neutral
+        eligible[i].top_cluster_hold_pct = clusters[0]?.holding_pct ?? null;
+      }
+    }
+    // Wash trading hard filter — fake volume = misleading fee yield
+    eligible.splice(0, eligible.length, ...eligible.filter((p) => {
+      if (p.is_wash) {
+        log("screening", `Risk filter: dropped ${p.name} — wash trading flagged`);
+        pushFilteredReason(filteredOut, p, "wash trading flagged");
+        return false;
+      }
+      return true;
+    }));
+
+    // Bundle hard filter — drops pools with high bundler concentration (rug risk).
+    // Real-world cost (2026-05-02): MOGMAN-SOL had 14–17% bundle and rugged for -82%.
+    const maxBundle = config.screening.maxBundlePct;
+    if (maxBundle != null) {
+      eligible.splice(0, eligible.length, ...eligible.filter((p) => {
+        if (Number.isFinite(p.bundle_pct) && p.bundle_pct > maxBundle) {
+          log("screening", `Bundle filter: dropped ${p.name} — bundle ${p.bundle_pct}% > ${maxBundle}%`);
+          pushFilteredReason(filteredOut, p, `bundle ${p.bundle_pct}% > ${maxBundle}%`);
+          return false;
+        }
+        return true;
+      }));
+    }
+
+    // Hourly dump filter — drops pools dumping more than threshold over 1h.
+    // Catches falling-knife entries that the timeframe-specific (e.g. 30m)
+    // maxPriceChangePct filter misses. MOGMAN-SOL had -25% 1h drop at deploy.
+    const maxHourlyDrop = config.screening.maxHourlyDumpPct;
+    if (maxHourlyDrop != null) {
+      eligible.splice(0, eligible.length, ...eligible.filter((p) => {
+        if (Number.isFinite(p.price_change_1h) && p.price_change_1h < -Math.abs(maxHourlyDrop)) {
+          log("screening", `Hourly dump filter: dropped ${p.name} — 1h ${p.price_change_1h.toFixed(1)}% < -${maxHourlyDrop}%`);
+          pushFilteredReason(filteredOut, p, `1h drop ${p.price_change_1h.toFixed(1)}% < -${maxHourlyDrop}%`);
+          return false;
+        }
+        return true;
+      }));
+    }
+
+    // ATH filter — drop pools where price is too close to ATH
+    const athFilter = config.screening.athFilterPct;
+    if (athFilter != null) {
+      const threshold = 100 + athFilter; // e.g. -20 → threshold = 80 (price must be <= 80% of ATH)
+      const before = eligible.length;
+      eligible.splice(0, eligible.length, ...eligible.filter((p) => {
+        if (p.price_vs_ath_pct == null) return true; // no data → don't filter
+        if (p.price_vs_ath_pct > threshold) {
+          log("screening", `ATH filter: dropped ${p.name} — ${p.price_vs_ath_pct}% of ATH (limit: ${threshold}%)`);
+          pushFilteredReason(filteredOut, p, `${p.price_vs_ath_pct}% of ATH > ${threshold}% limit`);
+          return false;
+        }
+        return true;
+      }));
+      if (eligible.length < before) log("screening", `ATH filter removed ${before - eligible.length} pool(s)`);
+    }
+
+    // Drop any pools whose creator is on the dev blocklist (caught via advanced-info)
     const before = eligible.length;
     const filtered = eligible.filter((p) => {
       if (p.dev && isDevBlocked(p.dev)) {

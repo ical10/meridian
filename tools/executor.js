@@ -21,6 +21,7 @@ import { blockDev, unblockDev, listBlockedDevs } from "../dev-blocklist.js";
 import { addSmartWallet, removeSmartWallet, listSmartWallets, checkSmartWalletsOnPool } from "../smart-wallets.js";
 import { getTokenInfo, getTokenHolders, getTokenNarrative } from "./token.js";
 import { config, reloadScreeningThresholds, MIN_SAFE_BINS_BELOW } from "../config.js";
+import { CONFIG_MAP } from "../config-map.js";
 import { getRecentDecisions } from "../decision-log.js";
 import fs from "fs";
 import { execSync, spawn } from "child_process";
@@ -294,157 +295,6 @@ const toolMap = {
     return { error: "invalid mode" };
   },
   update_config: ({ changes, reason = "" }) => {
-    // Flat key → config section mapping (covers everything in config.js)
-    const CONFIG_MAP = {
-      // screening
-      screeningSource: ["screening", "source"],
-      minFeeActiveTvlRatio: ["screening", "minFeeActiveTvlRatio"],
-      excludeHighSupplyConcentration: ["screening", "excludeHighSupplyConcentration"],
-      minTvl: ["screening", "minTvl"],
-      maxTvl: ["screening", "maxTvl"],
-      minVolume: ["screening", "minVolume"],
-      minOrganic: ["screening", "minOrganic"],
-      minQuoteOrganic: ["screening", "minQuoteOrganic"],
-      minHolders: ["screening", "minHolders"],
-      minMcap: ["screening", "minMcap"],
-      maxPriceChangePct: ["screening", "maxPriceChangePct"],
-      maxMcap: ["screening", "maxMcap"],
-      minBinStep: ["screening", "minBinStep"],
-      maxBinStep: ["screening", "maxBinStep"],
-      timeframe: ["screening", "timeframe"],
-      category: ["screening", "category"],
-      minTokenFeesSol: ["screening", "minTokenFeesSol"],
-      useDiscordSignals: ["screening", "useDiscordSignals"],
-      discordSignalMode: ["screening", "discordSignalMode"],
-      avoidPvpSymbols: ["screening", "avoidPvpSymbols"],
-      blockPvpSymbols: ["screening", "blockPvpSymbols"],
-      maxBotHoldersPct: ["screening", "maxBotHoldersPct"],
-      maxTop10Pct: ["screening", "maxTop10Pct"],
-      allowedLaunchpads: ["screening", "allowedLaunchpads"],
-      blockedLaunchpads: ["screening", "blockedLaunchpads"],
-      minTokenAgeHours: ["screening", "minTokenAgeHours"],
-      maxTokenAgeHours: ["screening", "maxTokenAgeHours"],
-      minFeePerTvl24h: ["management", "minFeePerTvl24h"],
-      // management
-      minClaimAmount: ["management", "minClaimAmount"],
-      autoSwapAfterClaim: ["management", "autoSwapAfterClaim"],
-      outOfRangeBinsToClose: ["management", "outOfRangeBinsToClose"],
-      outOfRangeWaitMinutes: ["management", "outOfRangeWaitMinutes"],
-      oorCooldownTriggerCount: ["management", "oorCooldownTriggerCount"],
-      oorCooldownHours: ["management", "oorCooldownHours"],
-      repeatDeployCooldownEnabled: ["management", "repeatDeployCooldownEnabled"],
-      repeatDeployCooldownTriggerCount: ["management", "repeatDeployCooldownTriggerCount"],
-      repeatDeployCooldownHours: ["management", "repeatDeployCooldownHours"],
-      repeatDeployCooldownScope: ["management", "repeatDeployCooldownScope"],
-      repeatDeployCooldownMinFeeEarnedPct: ["management", "repeatDeployCooldownMinFeeEarnedPct"],
-      recentLossCooldownPct: ["management", "recentLossCooldownPct"],
-      recentLossCooldownHours: ["management", "recentLossCooldownHours"],
-      minVolumeToRebalance: ["management", "minVolumeToRebalance"],
-      stopLossPct: ["management", "stopLossPct"],
-      takeProfitPct: ["management", "takeProfitPct"],
-      takeProfitFeePct: ["management", "takeProfitPct"],
-      trailingTakeProfit: ["management", "trailingTakeProfit"],
-      trailingTriggerPct: ["management", "trailingTriggerPct"],
-      trailingDropPct: ["management", "trailingDropPct"],
-      pnlSanityMaxDiffPct: ["management", "pnlSanityMaxDiffPct"],
-      solMode: ["management", "solMode"],
-      minSolToOpen: ["management", "minSolToOpen"],
-      deployAmountSol: ["management", "deployAmountSol"],
-      gasReserve: ["management", "gasReserve"],
-      positionSizePct: ["management", "positionSizePct"],
-      minAgeBeforeYieldCheck: ["management", "minAgeBeforeYieldCheck"],
-      // risk
-      maxPositions: ["risk", "maxPositions"],
-      maxDeployAmount: ["risk", "maxDeployAmount"],
-      // schedule
-      managementIntervalMin: ["schedule", "managementIntervalMin"],
-      screeningIntervalMin: ["schedule", "screeningIntervalMin"],
-      healthCheckIntervalMin: ["schedule", "healthCheckIntervalMin"],
-      // models
-      managementModel: ["llm", "managementModel"],
-      screeningModel: ["llm", "screeningModel"],
-      generalModel: ["llm", "generalModel"],
-      temperature: ["llm", "temperature"],
-      maxTokens: ["llm", "maxTokens"],
-      maxSteps: ["llm", "maxSteps"],
-      // strategy
-      strategy:     ["strategy", "strategy"],
-      binsBelow:    ["strategy", "maxBinsBelow", ["maxBinsBelow"]],
-      minBinsBelow: ["strategy", "minBinsBelow"],
-      maxBinsBelow: ["strategy", "maxBinsBelow"],
-      defaultBinsBelow: ["strategy", "defaultBinsBelow"],
-      // hivemind
-      hiveMindUrl: ["hiveMind", "url"],
-      hiveMindApiKey: ["hiveMind", "apiKey"],
-      agentId: ["hiveMind", "agentId"],
-      hiveMindPullMode: ["hiveMind", "pullMode"],
-      // meridian api / relay
-      publicApiKey: ["api", "publicApiKey"],
-      agentMeridianApiUrl: ["api", "url"],
-      lpAgentRelayEnabled: ["api", "lpAgentRelayEnabled"],
-      // pnl fetcher / poller
-      pnlSource: ["pnl", "source"],
-      pnlRpcUrl: ["pnl", "rpcUrl"],
-      pnlPollIntervalSec: ["pnl", "pollIntervalSec"],
-      pnlDepositCacheTtlSec: ["pnl", "depositCacheTtlSec"],
-      // GMGN screening
-      gmgnFeeSource: ["gmgn", "feeSource"],
-      gmgnApiKey: ["gmgn", "apiKey"],
-      gmgnBaseUrl: ["gmgn", "baseUrl"],
-      gmgnInterval: ["gmgn", "interval"],
-      gmgnOrderBy: ["gmgn", "orderBy"],
-      gmgnDirection: ["gmgn", "direction"],
-      gmgnLimit: ["gmgn", "limit"],
-      gmgnEnrichLimit: ["gmgn", "enrichLimit"],
-      gmgnRequestDelayMs: ["gmgn", "requestDelayMs"],
-      gmgnMaxRetries: ["gmgn", "maxRetries"],
-      gmgnHoldersLimit: ["gmgn", "holdersLimit"],
-      gmgnKlineResolution: ["gmgn", "klineResolution"],
-      gmgnKlineLookbackMinutes: ["gmgn", "klineLookbackMinutes"],
-      gmgnFilters: ["gmgn", "filters"],
-      gmgnPlatforms: ["gmgn", "platforms"],
-      gmgnMinMcap: ["gmgn", "minMcap"],
-      gmgnMaxMcap: ["gmgn", "maxMcap"],
-      gmgnMinVolume: ["gmgn", "minVolume"],
-      gmgnMinHolders: ["gmgn", "minHolders"],
-      gmgnMinTokenAgeHours: ["gmgn", "minTokenAgeHours"],
-      gmgnMaxTokenAgeHours: ["gmgn", "maxTokenAgeHours"],
-      gmgnAthFilterPct: ["gmgn", "athFilterPct"],
-      gmgnMaxTop10HolderRate: ["gmgn", "maxTop10HolderRate"],
-      gmgnMaxBundlerRate: ["gmgn", "maxBundlerRate"],
-      gmgnMaxRatTraderRate: ["gmgn", "maxRatTraderRate"],
-      gmgnMaxFreshWalletRate: ["gmgn", "maxFreshWalletRate"],
-      gmgnMaxDevTeamHoldRate: ["gmgn", "maxDevTeamHoldRate"],
-      gmgnMaxBotDegenRate: ["gmgn", "maxBotDegenRate"],
-      gmgnMaxSniperCount: ["gmgn", "maxSniperCount"],
-      gmgnMaxSniperHoldRate: ["gmgn", "maxSniperHoldRate"],
-      gmgnPreferredKolNames: ["gmgn", "preferredKolNames"],
-      gmgnPreferredKolMinHoldPct: ["gmgn", "preferredKolMinHoldPct"],
-      gmgnDumpKolNames: ["gmgn", "dumpKolNames"],
-      gmgnDumpKolMinHoldPct: ["gmgn", "dumpKolMinHoldPct"],
-      gmgnRequireKol: ["gmgn", "requireKol"],
-      gmgnMinKolCount: ["gmgn", "minKolCount"],
-      gmgnMinSmartDegenCount: ["gmgn", "minSmartDegenCount"],
-      gmgnMinTotalFeeSol: ["gmgn", "minTotalFeeSol"],
-      gmgnIndicatorFilter: ["gmgn", "indicatorFilter"],
-      gmgnIndicatorInterval: ["gmgn", "indicatorInterval"],
-      gmgnRequireBullishSt: ["gmgn", "indicatorRules", "requireBullishSupertrend"],
-      gmgnRejectAtBottom: ["gmgn", "indicatorRules", "rejectAlreadyAtBottom"],
-      gmgnRequireAboveSt: ["gmgn", "indicatorRules", "requireAboveSupertrend"],
-      gmgnMinRsi: ["gmgn", "indicatorRules", "minRsi"],
-      gmgnMaxRsi: ["gmgn", "indicatorRules", "maxRsi"],
-      gmgnRequireBbPosition: ["gmgn", "indicatorRules", "requireBbPosition"],
-      // chart indicators
-      chartIndicatorsEnabled: ["indicators", "enabled", ["chartIndicators", "enabled"]],
-      indicatorEntryPreset: ["indicators", "entryPreset", ["chartIndicators", "entryPreset"]],
-      indicatorExitPreset: ["indicators", "exitPreset", ["chartIndicators", "exitPreset"]],
-      rsiLength: ["indicators", "rsiLength", ["chartIndicators", "rsiLength"]],
-      indicatorIntervals: ["indicators", "intervals", ["chartIndicators", "intervals"]],
-      indicatorCandles: ["indicators", "candles", ["chartIndicators", "candles"]],
-      rsiOversold: ["indicators", "rsiOversold", ["chartIndicators", "rsiOversold"]],
-      rsiOverbought: ["indicators", "rsiOverbought", ["chartIndicators", "rsiOverbought"]],
-      requireAllIntervals: ["indicators", "requireAllIntervals", ["chartIndicators", "requireAllIntervals"]],
-    };
 
     const applied = {};
     const unknown = [];
@@ -658,7 +508,7 @@ export async function executeTool(name, args) {
       } else if (name === "deploy_position") {
         notifyDeploy({ pair: result.pool_name || args.pool_name || args.pool_address?.slice(0, 8), amountSol: args.amount_y ?? args.amount_sol ?? 0, position: result.position, tx: result.txs?.[0] ?? result.tx, priceRange: result.price_range, rangeCoverage: result.range_coverage, binStep: result.bin_step, baseFee: result.base_fee }).catch(() => {});
       } else if (name === "close_position") {
-        notifyClose({ pair: result.pool_name || args.position_address?.slice(0, 8), pnlUsd: result.pnl_usd ?? 0, pnlPct: result.pnl_pct ?? 0 }).catch(() => {});
+        notifyClose({ pair: result.pool_name || args.position_address?.slice(0, 8), pnlUsd: result.pnl_usd ?? 0, pnlPct: result.pnl_pct ?? 0, reason: args.reason }).catch(() => {});
         // Note low-yield closes in pool memory so screener avoids redeploying
         if (args.reason && args.reason.toLowerCase().includes("yield")) {
           const poolAddr = result.pool || args.pool_address;
