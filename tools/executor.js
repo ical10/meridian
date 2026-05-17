@@ -557,6 +557,20 @@ export async function executeTool(name, args) {
       success: false,
     });
 
+    // Pre-flight validation errors (raised inside the tool BEFORE any chain
+    // call) should look like safety-block rejections to the agent loop, so
+    // deploy_position can be retried with corrected params instead of being
+    // permanently locked by NO_RETRY_TOOLS. These are bounded patterns thrown
+    // from dlmm.js before any SDK/RPC interaction.
+    const isPreflight = /Invalid (deploy|bin) range|Invalid strategy/i.test(error.message);
+    if (isPreflight) {
+      return {
+        blocked: true,
+        reason: error.message,
+        tool: name,
+      };
+    }
+
     // Return error to LLM so it can decide what to do
     return {
       error: error.message,
