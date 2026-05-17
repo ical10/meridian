@@ -311,21 +311,50 @@ export async function runManagementCycle({ silent = false } = {}) {
     mgmtReport = reportLines.join("\n\n") +
       `\n\nSummary: 💼 ${positions.length} positions | ${cur}${totalValue.toFixed(4)} | fees: ${cur}${totalUnclaimed.toFixed(4)} | ${actionSummary}`;
 
-    // ── Call LLM only if action needed ──────────────────────────────
-    const actionPositions = positionData.filter(p => {
-      const a = actionMap.get(p.position);
-      return a.action !== "STAY";
+    // ── Execute actions ──────────────────────────────
+    // CLOSE/CLAIM are fully deterministic — run them directly via executeTool,
+    // so a provider outage can't block exits. Only INSTRUCTION needs the LLM.
+    const actionPositions = positionData.filter(p => actionMap.get(p.position).action !== "STAY");
+    const deterministicPositions = actionPositions.filter(p => {
+      const a = actionMap.get(p.position).action;
+      return a === "CLOSE" || a === "CLAIM";
     });
+    const llmPositions = actionPositions.filter(p => actionMap.get(p.position).action === "INSTRUCTION");
 
-    if (actionPositions.length > 0) {
-      log("cron", `Management: ${actionPositions.length} action(s) needed — invoking LLM [model: ${config.llm.managementModel}]`);
+    const detResultLines = [];
+    for (const p of deterministicPositions) {
+      const act = actionMap.get(p.position);
+      const tool = act.action === "CLOSE" ? "close_position" : "claim_fees";
+      const args = act.action === "CLOSE"
+        ? { position_address: p.position, reason: act.reason || `rule ${act.rule}` }
+        : { position_address: p.position };
+      log("cron", `Deterministic ${act.action}: ${p.pair} (${act.reason ?? `rule ${act.rule}`})`);
+      await liveMessage?.toolStart(tool);
+      let result, success = false, errMsg = null;
+      try {
+        result = await executeTool(tool, args);
+        success = result?.success !== false && !result?.error && !result?.blocked;
+        if (result?.blocked) errMsg = `blocked: ${result.reason}`;
+        else if (result?.error) errMsg = result.error;
+      } catch (e) {
+        errMsg = e.message;
+      }
+      await liveMessage?.toolFinish(tool, result, success);
+      detResultLines.push(success
+        ? `✅ ${p.pair}: ${act.action === "CLOSE" ? `Closed (${act.reason ?? `rule ${act.rule}`})` : "Claimed fees"}${result?.pnl_pct != null ? ` — PnL ${result.pnl_pct}% ($${result.pnl_usd ?? "?"})` : ""}`
+        : `❌ ${p.pair}: ${act.action} failed — ${errMsg ?? "unknown error"}`);
+    }
+    if (detResultLines.length > 0) mgmtReport += `\n\n${detResultLines.join("\n")}`;
 
-      const actionBlocks = actionPositions.map((p) => {
+    if (llmPositions.length > 0) {
+      log("cron", `Management: ${llmPositions.length} INSTRUCTION position(s) — invoking LLM [model: ${config.llm.managementModel}]`);
+
+      const actionBlocks = llmPositions.map((p) => {
         const act = actionMap.get(p.position);
         return [
           `POSITION: ${p.pair} (${p.position})`,
           `  pool: ${p.pool}`,
-          `  action: ${act.action}${act.rule && act.rule !== "exit" ? ` — Rule ${act.rule}: ${act.reason}` : ""}${act.rule === "exit" ? ` — ⚡ Trailing TP: ${act.reason}` : ""}`,
+          `  action: ${act.action}`,
           `  pnl_pct: ${p.pnl_pct}% | unclaimed_fees: ${cur}${p.unclaimed_fees_usd} | value: ${cur}${p.total_value_usd} | fee_per_tvl_24h: ${p.fee_per_tvl_24h ?? "?"}%`,
           `  bins: lower=${p.lower_bin} upper=${p.upper_bin} active=${p.active_bin} | oor_minutes: ${p.minutes_out_of_range ?? 0}`,
           p.instruction ? `  instruction: "${p.instruction}"` : null,
@@ -333,17 +362,11 @@ export async function runManagementCycle({ silent = false } = {}) {
       }).join("\n\n");
 
       const { content } = await agentLoop(`
-MANAGEMENT ACTION REQUIRED — ${actionPositions.length} position(s)
+MANAGEMENT INSTRUCTION EVALUATION — ${llmPositions.length} position(s)
 
 ${actionBlocks}
 
-RULES:
-- CLOSE: call close_position only — it handles fee claiming internally, do NOT call claim_fees first
-- CLAIM: call claim_fees with position address
-- INSTRUCTION: evaluate the instruction condition. If met → close_position. If not → HOLD, do nothing.
-- ⚡ exit alerts: close immediately, no exceptions
-
-Execute the required actions. Do NOT re-evaluate CLOSE/CLAIM — rules already applied. Just execute.
+For each position, evaluate the instruction condition. If met → close_position. If not → HOLD, do nothing.
 After executing, write a brief one-line result per position.
       `, config.llm.maxSteps, [], "MANAGER", config.llm.managementModel, 2048, {
         onToolStart: async ({ name }) => { await liveMessage?.toolStart(name); },
@@ -351,7 +374,7 @@ After executing, write a brief one-line result per position.
       });
 
       mgmtReport += `\n\n${content}`;
-    } else {
+    } else if (actionPositions.length === 0) {
       log("cron", "Management: all positions STAY — skipping LLM");
       await liveMessage?.note("No tool actions needed.");
     }
