@@ -4,6 +4,8 @@ import { buildSystemPrompt } from "./prompt.js";
 import { executeTool } from "./tools/executor.js";
 import { tools } from "./tools/definitions.js";
 
+const MAX_RATE_LIMIT_RETRIES = 3;
+
 const MANAGER_TOOLS  = new Set(["close_position", "claim_fees", "swap_token", "get_position_pnl", "get_my_positions", "get_wallet_balance"]);
 const SCREENER_TOOLS = new Set(["deploy_position", "get_active_bin", "get_top_candidates", "check_smart_wallets_on_pool", "get_token_holders", "get_token_narrative", "get_token_info", "search_pools", "get_pool_memory", "get_wallet_balance", "get_my_positions"]);
 const GENERAL_INTENT_ONLY_TOOLS = new Set([
@@ -188,6 +190,7 @@ export async function agentLoop(goal, maxSteps = config.llm.maxSteps, sessionHis
   let omitToolChoice = false;
 
   let emptyStreak = 0;
+  let rateLimitRetries = 0;
   for (let step = 0; step < maxSteps; step++) {
     log("agent", `Step ${step + 1}/${maxSteps}`);
 
@@ -369,9 +372,21 @@ export async function agentLoop(goal, maxSteps = config.llm.maxSteps, sessionHis
     } catch (error) {
       log("error", `Agent loop error at step ${step}: ${error.message}`);
 
-      // If it's a rate limit, wait and retry
+      // If it's a rate limit, wait and retry — capped per agentLoop call.
+      // Terminal 429s (suspended account, invalid key, insufficient balance) never
+      // recover from waiting, so detect those by message and fail fast.
       if (error.status === 429) {
-        log("agent", "Rate limited, waiting 30s...");
+        const msg = String(error?.message || "").toLowerCase();
+        if (/suspended|insufficient balance|invalid api key|invalid auth|account.*deactivated/.test(msg)) {
+          log("error", `Terminal 429 (auth/billing) — not retrying: ${error.message}`);
+          throw error;
+        }
+        rateLimitRetries += 1;
+        if (rateLimitRetries > MAX_RATE_LIMIT_RETRIES) {
+          log("error", `Rate limit exceeded ${MAX_RATE_LIMIT_RETRIES} retries — giving up this cycle`);
+          throw error;
+        }
+        log("agent", `Rate limited, waiting 30s... (retry ${rateLimitRetries}/${MAX_RATE_LIMIT_RETRIES})`);
         await sleep(30000);
         continue;
       }
