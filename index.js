@@ -501,7 +501,18 @@ export async function runScreeningCycle({ silent = false } = {}) {
     // Hard filters after token recon — block launchpads and excessive Jupiter bot holders
     // Skipped for GMGN: platforms already filtered upstream; bundler/bot data from GMGN pipeline
     const filteredOut = [];
-    const passing = allCandidates.filter(({ pool, ti }) => {
+    const passing = allCandidates.filter(({ pool, ti, sw }) => {
+      // Smart-wallet presence — anti-rug hard filter, applies to BOTH meteora and gmgn paths.
+      // Stake-SOL 2026-05-26 incident: rug at -30.88% on a pool with zero smart wallets.
+      // Real money piling in is the strongest "this isn't an exit-liquidity trap" signal.
+      if (config.screening.requireSmartWallets) {
+        const swCount = sw?.in_pool?.length ?? 0;
+        if (swCount === 0) {
+          log("screening", `Smart-wallet filter: dropped ${pool.name} — 0 smart wallets present`);
+          filteredOut.push({ name: pool.name, reason: "no smart wallets present (anti-rug)" });
+          return false;
+        }
+      }
       if (pool.gmgn) return true;
       const launchpad = ti?.launchpad ?? null;
       if (launchpad && config.screening.allowedLaunchpads?.length > 0 && !config.screening.allowedLaunchpads.includes(launchpad)) {
