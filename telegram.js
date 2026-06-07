@@ -144,6 +144,26 @@ async function postTelegramRaw(method, body) {
   }
 }
 
+async function postTelegramRaw(method, body) {
+  if (!TOKEN) return null;
+  try {
+    const res = await fetch(`${BASE}/${method}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      log("telegram_error", `${method} ${res.status}: ${err.slice(0, 200)}`);
+      return null;
+    }
+    return await res.json();
+  } catch (e) {
+    log("telegram_error", `${method} failed: ${e.message}`);
+    return null;
+  }
+}
+
 export async function sendMessage(text) {
   if (!TOKEN || !chatId) return;
   return postTelegram("sendMessage", { text: String(text).slice(0, 4096) });
