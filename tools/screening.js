@@ -137,8 +137,31 @@ function getRawPoolScreeningRejectReason(pool, s) {
   if (binStep == null || binStep < s.minBinStep) return `bin_step ${binStep ?? "unknown"} below minBinStep ${s.minBinStep}`;
   if (binStep > s.maxBinStep) return `bin_step ${binStep} above maxBinStep ${s.maxBinStep}`;
   if (!isUsableVolatility(volatility)) return `volatility ${volatility ?? "unknown"} unusable`;
-  if (feeActiveTvlRatio == null || feeActiveTvlRatio < s.minFeeActiveTvlRatio) {
-    return `fee/active-TVL ${feeActiveTvlRatio ?? "unknown"} below minFeeActiveTvlRatio ${s.minFeeActiveTvlRatio}`;
+  if (s.minVolatility != null && volatility < s.minVolatility) {
+    return `volatility ${volatility} below minVolatility ${s.minVolatility}`;
+  }
+  if (feeActiveTvlRatio == null) {
+    return `fee/active-TVL unknown`;
+  }
+  // Multi-band interface takes precedence when set (non-empty array of [low, high?]).
+  // Otherwise fall back to min/max.
+  const bands = Array.isArray(s.feeActiveTvlBands) && s.feeActiveTvlBands.length > 0
+    ? s.feeActiveTvlBands
+    : null;
+  if (bands) {
+    const inAnyBand = bands.some(([lo, hi]) =>
+      feeActiveTvlRatio >= lo && (hi == null || feeActiveTvlRatio <= hi)
+    );
+    if (!inAnyBand) {
+      return `fee/active-TVL ${feeActiveTvlRatio} not in any feeActiveTvlBands ${JSON.stringify(bands)}`;
+    }
+  } else {
+    if (feeActiveTvlRatio < s.minFeeActiveTvlRatio) {
+      return `fee/active-TVL ${feeActiveTvlRatio} below minFeeActiveTvlRatio ${s.minFeeActiveTvlRatio}`;
+    }
+    if (s.maxFeeActiveTvlRatio != null && feeActiveTvlRatio > s.maxFeeActiveTvlRatio) {
+      return `fee/active-TVL ${feeActiveTvlRatio} above maxFeeActiveTvlRatio ${s.maxFeeActiveTvlRatio}`;
+    }
   }
   if (baseOrganic == null || baseOrganic < s.minOrganic) {
     return `base organic ${baseOrganic ?? "unknown"} below minOrganic ${s.minOrganic}`;
@@ -421,7 +444,25 @@ export async function discoverPools({
     s.maxTvl != null ? `tvl<=${s.maxTvl}` : null,
     `dlmm_bin_step>=${s.minBinStep}`,
     `dlmm_bin_step<=${s.maxBinStep}`,
-    `fee_active_tvl_ratio>=${s.minFeeActiveTvlRatio}`,
+    // When feeActiveTvlBands is configured, the API-level filter uses the overall
+    // min (lowest band low) and optional overall max (highest band high; if any
+    // band has hi=null, drop the API cap and let the in-app band check handle it).
+    ...(Array.isArray(s.feeActiveTvlBands) && s.feeActiveTvlBands.length > 0
+      ? (() => {
+          const lows = s.feeActiveTvlBands.map(([lo]) => lo).filter((x) => typeof x === "number");
+          const hasOpenBand = s.feeActiveTvlBands.some(([, hi]) => hi == null);
+          const highs = s.feeActiveTvlBands.map(([, hi]) => hi).filter((x) => typeof x === "number");
+          const overallMin = lows.length ? Math.min(...lows) : null;
+          const overallMax = hasOpenBand || highs.length === 0 ? null : Math.max(...highs);
+          return [
+            overallMin != null ? `fee_active_tvl_ratio>=${overallMin}` : null,
+            overallMax != null ? `fee_active_tvl_ratio<=${overallMax}` : null,
+          ];
+        })()
+      : [
+          `fee_active_tvl_ratio>=${s.minFeeActiveTvlRatio}`,
+          s.maxFeeActiveTvlRatio != null ? `fee_active_tvl_ratio<=${s.maxFeeActiveTvlRatio}` : null,
+        ]),
     `base_token_organic_score>=${s.minOrganic}`,
     `quote_token_organic_score>=${s.minQuoteOrganic}`,
     s.minTokenAgeHours != null ? `base_token_created_at<=${Date.now() - s.minTokenAgeHours * 3_600_000}` : null,

@@ -628,8 +628,12 @@ export function getLessonsForPrompt(opts = {}) {
   // Smaller caps for automated cycles — they don't need the full lesson history
   const isAutoCycle = agentType === "SCREENER" || agentType === "MANAGER";
   const PINNED_CAP  = isAutoCycle ? 5  : 10;
-  const ROLE_CAP    = isAutoCycle ? 6  : 15;
-  const RECENT_CAP  = maxLessons ?? (isAutoCycle ? 10 : 35);
+  const ROLE_CAP    = isAutoCycle ? 3  : 15;
+  const RECENT_CAP  = maxLessons ?? (isAutoCycle ? 5 : 35);
+
+  // 14-day recency cutoff for auto-cycle RECENT bucket only — stale lessons drift out
+  const RECENT_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;
+  const recentCutoff = isAutoCycle ? new Date(Date.now() - RECENT_MAX_AGE_MS).toISOString() : null;
 
   const outcomePriority = { bad: 0, poor: 1, failed: 1, good: 2, worked: 2, manual: 1, neutral: 3, evolution: 2 };
   const byPriority = (a, b) => (outcomePriority[a.outcome] ?? 3) - (outcomePriority[b.outcome] ?? 3);
@@ -663,7 +667,11 @@ export function getLessonsForPrompt(opts = {}) {
   const remainingBudget = RECENT_CAP - pinned.length - roleMatched.length;
   const recent = remainingBudget > 0
     ? data.lessons
-        .filter((l) => !usedIds.has(l.id))
+        .filter((l) => {
+          if (usedIds.has(l.id)) return false;
+          if (recentCutoff && (l.created_at || "") < recentCutoff) return false;
+          return true;
+        })
         .sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""))
         .slice(0, remainingBudget)
     : [];

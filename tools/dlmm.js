@@ -333,7 +333,36 @@ function getTransactionInstructions(tx) {
     .filter(Boolean);
 }
 
-function assertNoUnsafeSystemTransfer(tx, wallet, allowedDestinations = []) {
+// Jito mainnet tip accounts — 8 load-balanced destinations Jito uses for
+// MEV-protection bundle tips. The relay's zap-in / zap-out transactions
+// include a small (~1500 lamports) SystemProgram.Transfer to one of these
+// per bundle so the tx submits via Jito with MEV protection + atomic bundle
+// inclusion. The destination rotates per request to spread leader load.
+// Verified on-chain — all 8 are owned by the Jito tip program
+// T1pyyaTNZsKv2WcRAB8oVnk93mLJw2XzjtVYqCsaHqt.
+// Sources:
+//   https://solana.com/developers/cookbook/transactions/mev-protection
+//   https://docs.jito.wtf/lowlatencytxnsend/#gettipaccounts
+const JITO_TIP_ACCOUNTS = [
+  "96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5",
+  "HFqU5x63VTqvQss8hp11i4wVV8bD44PvwucfZ2bU7gRe",
+  "Cw8CFyM9FkoMi7K7Crf6HNQqf4uEMzpKw6QNghXLvLkY",
+  "ADaUMid9yfUytqMBgopwjb2DTLSokTSzL1zt6iGPaS49",
+  "DfXygSm4jCyNCybVYYK6DwvWqjKee8pbDmJGcLWNDXjh",
+  "ADuUkR4vqLUMWXxW9gh6D6L8pMSawimctcNZ5pGwDcEt",
+  "DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL",
+  "3AVi9Tg9Uo68tJfuvoKvqKNWKkC5wPdSSdeBnizKZ6jT",
+];
+
+// Per-transfer carve-out (in lamports) for legitimate small SOL transfers
+// the relay performs as standard Solana tx infrastructure — primarily
+// brand-new SPL token account creation (rent-exempt minimum for a 165-byte
+// SPL token account is 2,039,280 lamports = ~0.002 SOL). Set just above
+// that to cover routine variations. Multiple small transfers still bounded
+// by the net `maxSolLoss` simulation check in signAndSimulateRelayTransactions.
+const RELAY_SMALL_TRANSFER_LAMPORTS = 2_500_000;
+
+function assertNoUnsafeSystemTransfer(tx, wallet, allowedDestinations = [], smallAmountLamports = 0) {
   const owner = wallet.publicKey.toString();
   const allowed = new Set(allowedDestinations.filter(Boolean).map(String));
 
@@ -353,11 +382,13 @@ function assertNoUnsafeSystemTransfer(tx, wallet, allowedDestinations = []) {
       : SystemInstruction.decodeTransferWithSeed(ix);
     const source = decoded.fromPubkey?.toString();
     const destination = decoded.toPubkey?.toString();
-    if (source === owner && !allowed.has(destination)) {
-      throw new Error(
-        `Relay transaction contains direct SOL transfer from owner to ${destination?.slice(0, 8) || "unknown"}.`,
-      );
-    }
+    if (source !== owner) continue;
+    if (allowed.has(destination)) continue;
+    const lamports = Number(decoded.lamports || 0);
+    if (smallAmountLamports > 0 && lamports > 0 && lamports <= smallAmountLamports) continue;
+    throw new Error(
+      `Relay transaction contains direct SOL transfer from owner to ${destination?.slice(0, 8) || "unknown"} (${lamports} lamports).`,
+    );
   }
 }
 
@@ -371,6 +402,7 @@ async function signAndSimulateRelayTransactions(serializedTxs, wallet, {
   label,
   allowedDebitMints = [],
   allowedSystemTransferDestinations = [],
+  smallTransferLamports = 0,
   maxSolLoss = 0.05,
   requiredStaticAccounts = [],
 } = {}) {
@@ -384,7 +416,7 @@ async function signAndSimulateRelayTransactions(serializedTxs, wallet, {
 
     const signedBase64 = signSerializedTransaction(serialized, wallet);
     const tx = deserializeSignedTransaction(signedBase64);
-    assertNoUnsafeSystemTransfer(tx, wallet, allowedSystemTransferDestinations);
+    assertNoUnsafeSystemTransfer(tx, wallet, allowedSystemTransferDestinations, smallTransferLamports);
     const staticKeys = getStaticAccountKeyStrings(tx);
     for (const account of requiredStaticAccounts.filter(Boolean)) {
       if (!staticKeys.includes(String(account))) {
@@ -1721,12 +1753,16 @@ export async function closePosition({ position_address, reason }) {
         const closeSigned = await signAndSimulateRelayTransactions(closeUnsigned, wallet, {
           label: "zap-out close",
           allowedDebitMints: relayAllowedDebitMints,
+          allowedSystemTransferDestinations: JITO_TIP_ACCOUNTS,
+          smallTransferLamports: RELAY_SMALL_TRANSFER_LAMPORTS,
           maxSolLoss: 0.05,
           requiredStaticAccounts: [wallet.publicKey.toString(), position_address],
         });
         const swapSigned = await signAndSimulateRelayTransactions(swapUnsigned, wallet, {
           label: "zap-out swap",
           allowedDebitMints: relayAllowedDebitMints,
+          allowedSystemTransferDestinations: JITO_TIP_ACCOUNTS,
+          smallTransferLamports: RELAY_SMALL_TRANSFER_LAMPORTS,
           maxSolLoss: 0.05,
           requiredStaticAccounts: [wallet.publicKey.toString()],
         });

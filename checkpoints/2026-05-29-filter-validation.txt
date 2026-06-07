@@ -1,0 +1,55 @@
+============================================================
+Meridian Filter Validation Checkpoint
+Generated: 2026-05-29T09:00:01Z
+Filter enable cutoff: 2026-05-26T21:01 UTC
+Active filters:
+  - requireSmartWallets: true  (anti-rug)
+  - minTokenAgeHours:    6     (skip very-fresh tokens)
+============================================================
+
+## OVERALL ANALYZER OUTPUT — closes since filter enable
+# Meridian Performance Analyzer  (/root/meridian/meridian)
+# since: 2026-05-26
+# 103 closed positions loaded
+# 0 joined to [CLOSE] log line  (0% — older closes lack log coverage)
+
+## HEADLINE
+  no closed records joined to a [CLOSE] log line
+
+## PEAK PnL DISTRIBUTION (state.json peak_pnl_pct)
+  n= 103  min= +0.00%  p10= +0.06  p25= +0.23  med= +0.75  p75= +1.96  p90= +2.88  max= +5.86  |  mean= +1.22%
+  bucket → count (share)
+    (-∞,0)       0  (  0.0%)
+    [0,1)       61  ( 59.2%)
+    [1,3)       33  ( 32.0%)
+    [3,5)        8  (  7.8%)
+    [5,10)       1  (  1.0%)
+    [10,20)      0  (  0.0%)
+    [20,∞)       0  (  0.0%)
+
+## PEAK → CLOSE GIVEBACK (peak - close pnl_pct)
+  all closes:                no data
+
+  → on average, every winner gives back this much from its peak.
+    raise trailingDropPct only if mean giveback < trailingDropPct currently set.
+
+## EXIT REASON MIX
+  reason                                   n   share   avg pnl%     WR
+
+## DRAWDOWN → RECOVERY  (tip 2: "the clue is recovery")
+  Positions whose Stop-loss alert fired at least once while open
+  (i.e. PnL dipped to/past the configured SL threshold).
+  Outcome: did the position end positive (recovered) or negative?
+
+  positions with ≥1 SL alert during open:  23
+    closed positive (recovered):              0  (  0.0%)
+    closed negative (stayed down):           23  (100.0%)
+Traceback (most recent call last):
+  File "/root/meridian/meridian/scripts/analyze_performance.py", line 399, in <module>
+    main()
+  File "/root/meridian/meridian/scripts/analyze_performance.py", line 392, in main
+    report_recovery(records)
+  File "/root/meridian/meridian/scripts/analyze_performance.py", line 286, in report_recovery
+    avg_close = sum(r["close_pnl_pct"] for r in stayed_neg) / len(stayed_neg)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported operand type(s) for +: 'int' and 'NoneType'

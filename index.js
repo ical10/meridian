@@ -94,6 +94,9 @@ let _managementBusy = false; // prevents overlapping management cycles
 let _screeningBusy = false;  // prevents overlapping screening cycles
 let _screeningLastTriggered = 0; // epoch ms — prevents management from spamming screening
 let _pollTriggeredAt = 0; // epoch ms — cooldown for poller-triggered management
+let _lastCandidateFingerprint = null; // sorted comma-joined pool addresses of last evaluated candidate set
+let _lastCandidateFingerprintAt = 0;  // epoch ms — when fingerprint was recorded
+const CANDIDATE_CACHE_TTL_MS = 15 * 60 * 1000; // skip LLM if same candidate set seen within this window
 const _peakConfirmTimers = new Map();
 const _trailingDropConfirmTimers = new Map();
 const TRAILING_PEAK_CONFIRM_DELAY_MS = 15_000;
@@ -368,7 +371,7 @@ ${actionBlocks}
 
 For each position, evaluate the instruction condition. If met → close_position. If not → HOLD, do nothing.
 After executing, write a brief one-line result per position.
-      `, config.llm.maxSteps, [], "MANAGER", config.llm.managementModel, 2048, {
+      `, config.llm.maxStepsManager, [], "MANAGER", config.llm.managementModel, 2048, {
         onToolStart: async ({ name }) => { await liveMessage?.toolStart(name); },
         onToolFinish: async ({ name, result, success }) => { await liveMessage?.toolFinish(name, result, success); },
       });
@@ -476,6 +479,23 @@ export async function runScreeningCycle({ silent = false } = {}) {
       return screenReport;
     }
     const candidates = (topCandidates?.candidates || topCandidates?.pools || []).slice(0, 10);
+
+    // Short-circuit: if the candidate set is identical to the last evaluation within TTL, skip the LLM.
+    // The LLM already considered this exact set; re-running burns tokens without new information.
+    const fingerprint = candidates
+      .map((c) => c.pool || c.pool_address || "")
+      .filter(Boolean)
+      .sort()
+      .join(",");
+    const cacheAge = Date.now() - _lastCandidateFingerprintAt;
+    if (fingerprint && fingerprint === _lastCandidateFingerprint && cacheAge < CANDIDATE_CACHE_TTL_MS) {
+      log("cron", `Screening short-circuit: candidate set unchanged (${Math.round(cacheAge / 1000)}s old, ${candidates.length} pools) — skipping LLM`);
+      screenReport = `Screening skipped — identical candidate list, last evaluated ${Math.round(cacheAge / 60000)}min ago.`;
+      return screenReport;
+    }
+    _lastCandidateFingerprint = fingerprint;
+    _lastCandidateFingerprintAt = Date.now();
+
     const earlyFilteredExamples = topCandidates?.filtered_examples || [];
     const gmgnStageCounts = topCandidates?.stage_counts ?? null;
     const gmgnAllFiltered = topCandidates?.all_filtered ?? [];
@@ -729,7 +749,7 @@ STEPS:
    <short flat list of top candidate names and why they were skipped>
 IMPORTANT:
 - Keep the whole report compact and highly scannable for Telegram.
-      `, config.llm.maxSteps, [], "SCREENER", config.llm.screeningModel, 2048, {
+      `, config.llm.maxStepsScreener, [], "SCREENER", config.llm.screeningModel, 2048, {
         onToolStart: async ({ name }) => {
           if (name === "deploy_position") deployAttempted = true;
           await liveMessage?.toolStart(name);
@@ -794,7 +814,7 @@ export function startCronJobs() {
 HEALTH CHECK
 
 Summarize the current portfolio health, total fees earned, and performance of all open positions. Recommend any high-level adjustments if needed.
-      `, config.llm.maxSteps, [], "MANAGER");
+      `, config.llm.maxStepsManager, [], "MANAGER");
     } catch (error) {
       log("cron_error", `Health check failed: ${error.message}`);
     } finally {

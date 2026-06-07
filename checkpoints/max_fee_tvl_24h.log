@@ -1,0 +1,42 @@
+<stdin>:51: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+═══════════════════════════════════════════════════════════════════
+[2026-06-02T21:17:01Z] maxFeeActiveTvlRatio 24h checkpoint
+  Window: since 2026-06-01T21:17 (24h)
+  Filter: minFeeActiveTvlRatio=0.2, maxFeeActiveTvlRatio=1.0
+═══════════════════════════════════════════════════════════════════
+
+--- ACTIVITY ---
+  screening cycles: 307
+  short-circuits:   44
+  deploys:          167
+  deploy_failed:    1
+  closes:           16 (8 wins, 8 losses)
+  net PnL:          $-120.99
+
+--- FILTER IMPACT ---
+  pools rejected by maxFeeActiveTvlRatio: 0
+
+--- DEPLOYED POSITIONS' FEE/TVL DISTRIBUTION ---
+  count:            25
+  avg fee/TVL:      0.876
+  max fee/TVL:      4.522
+  in target [0.2, 1.0]: 21 (84%)
+
+--- BIGGEST LOSSES IN WINDOW ---
+  $-91.36 (-75.30%)
+  $-13.92 (-8.82%)
+  $-8.16 (-5.17%)
+  $-5.67 (-3.58%)
+  $-4.43 (-5.49%)
+
+--- TELEGRAM ---
+🔔 maxFeeActiveTvlRatio 24h check
+24h since 2026-06-01 21:17 UTC
+
+Deploys: 167 | Closes: 16 (8W/8L)
+Net PnL: $-120.99
+Filter rejects: 0 pools blocked by cap
+Avg fee/TVL of deploys: 0.876
+
+Full log: checkpoints/max_fee_tvl_24h.log
+[done: 21:17:01Z]

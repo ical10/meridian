@@ -1,0 +1,88 @@
+═══════════════════════════════════════════════════════════════════
+[2026-06-01T14:00:00Z] Switching to dump_spot (scheduled)
+═══════════════════════════════════════════════════════════════════
+[2026-06-01T14:00:00.084Z] [STRATEGY] Active strategy set to: Dump Spot — Bounce Catcher
+[2026-06-01T14:00:00.086Z] [STRATEGY] Applied 23 config_overrides for Dump Spot — Bounce Catcher:
+[2026-06-01T14:00:00.086Z] [STRATEGY]   strategy: "spot" → "spot"
+[2026-06-01T14:00:00.087Z] [STRATEGY]   minBinsBelow: 35 → 35
+[2026-06-01T14:00:00.087Z] [STRATEGY]   maxBinsBelow: 45 → 45
+[2026-06-01T14:00:00.087Z] [STRATEGY]   minBinStep: 80 → 80
+[2026-06-01T14:00:00.087Z] [STRATEGY]   maxBinStep: 150 → 150
+[2026-06-01T14:00:00.087Z] [STRATEGY]   takeProfitPct: 10 → 5
+[2026-06-01T14:00:00.087Z] [STRATEGY]   trailingTakeProfit: true → true
+[2026-06-01T14:00:00.087Z] [STRATEGY]   trailingTriggerPct: 2.5 → 3
+[2026-06-01T14:00:00.088Z] [STRATEGY]   trailingDropPct: 1.5 → 2
+[2026-06-01T14:00:00.088Z] [STRATEGY]   stopLossPct: -5 → -4
+[2026-06-01T14:00:00.088Z] [STRATEGY]   outOfRangeWaitMinutes: 10 → 15
+[2026-06-01T14:00:00.088Z] [STRATEGY]   category: "trending" → "trending"
+[2026-06-01T14:00:00.088Z] [STRATEGY]   minMcap: 100000 → 200000
+[2026-06-01T14:00:00.088Z] [STRATEGY]   minHolders: 500 → 500
+[2026-06-01T14:00:00.088Z] [STRATEGY]   minTokenAgeHours: 6 → 12
+[2026-06-01T14:00:00.088Z] [STRATEGY]   maxTokenAgeHours: null → 48
+[2026-06-01T14:00:00.088Z] [STRATEGY]   minVolume: 1000 → 20000
+[2026-06-01T14:00:00.088Z] [STRATEGY]   minTokenFeesSol: 5 → 20
+[2026-06-01T14:00:00.088Z] [STRATEGY]   athFilterPct: -15 → -40
+[2026-06-01T14:00:00.088Z] [STRATEGY]   maxHourlyDumpPct: 15 → 15
+[2026-06-01T14:00:00.088Z] [STRATEGY]   maxPriceChangePct: 10 → 25
+[2026-06-01T14:00:00.088Z] [STRATEGY]   maxBundlePct: 15 → 15
+[2026-06-01T14:00:00.088Z] [STRATEGY]   managementIntervalMin: 3 → 3
+active: dump_spot
+  takeProfitPct: 10 → 5
+  trailingTriggerPct: 2.5 → 3
+  trailingDropPct: 1.5 → 2
+  stopLossPct: -5 → -4
+  outOfRangeWaitMinutes: 10 → 15
+  minMcap: 100000 → 200000
+  minTokenAgeHours: 6 → 12
+  maxTokenAgeHours: null → 48
+  minVolume: 1000 → 20000
+  minTokenFeesSol: 5 → 20
+  athFilterPct: -15 → -40
+  maxPriceChangePct: 10 → 25
+killing old PID: 1593942
+new PID: 1594547
+[switch done: 14:00:13Z]
+═══════════════════════════════════════════════════════════════════
+[2026-06-02T14:00:00Z] Switching to dump_spot (scheduled)
+═══════════════════════════════════════════════════════════════════
+[2026-06-02T14:00:00.090Z] [STRATEGY] Active strategy set to: Dump Spot — Bounce Catcher
+[2026-06-02T14:00:00.093Z] [STRATEGY] Applied 23 config_overrides for Dump Spot — Bounce Catcher:
+[2026-06-02T14:00:00.093Z] [STRATEGY]   strategy: "spot" → "spot"
+[2026-06-02T14:00:00.093Z] [STRATEGY]   minBinsBelow: 35 → 35
+[2026-06-02T14:00:00.093Z] [STRATEGY]   maxBinsBelow: 45 → 45
+[2026-06-02T14:00:00.093Z] [STRATEGY]   minBinStep: 80 → 80
+[2026-06-02T14:00:00.093Z] [STRATEGY]   maxBinStep: 150 → 150
+[2026-06-02T14:00:00.093Z] [STRATEGY]   takeProfitPct: 4 → 5
+[2026-06-02T14:00:00.094Z] [STRATEGY]   trailingTakeProfit: true → true
+[2026-06-02T14:00:00.094Z] [STRATEGY]   trailingTriggerPct: 2.5 → 3
+[2026-06-02T14:00:00.094Z] [STRATEGY]   trailingDropPct: 1.5 → 2
+[2026-06-02T14:00:00.095Z] [STRATEGY]   stopLossPct: -5 → -4
+[2026-06-02T14:00:00.095Z] [STRATEGY]   outOfRangeWaitMinutes: 10 → 15
+[2026-06-02T14:00:00.095Z] [STRATEGY]   category: "trending" → "trending"
+[2026-06-02T14:00:00.095Z] [STRATEGY]   minMcap: 100000 → 200000
+[2026-06-02T14:00:00.095Z] [STRATEGY]   minHolders: 500 → 500
+[2026-06-02T14:00:00.095Z] [STRATEGY]   minTokenAgeHours: 6 → 12
+[2026-06-02T14:00:00.095Z] [STRATEGY]   maxTokenAgeHours: null → 48
+[2026-06-02T14:00:00.095Z] [STRATEGY]   minVolume: 1000 → 20000
+[2026-06-02T14:00:00.095Z] [STRATEGY]   minTokenFeesSol: 5 → 20
+[2026-06-02T14:00:00.095Z] [STRATEGY]   athFilterPct: -15 → -30
+[2026-06-02T14:00:00.095Z] [STRATEGY]   maxHourlyDumpPct: 15 → 15
+[2026-06-02T14:00:00.095Z] [STRATEGY]   maxPriceChangePct: 10 → 25
+[2026-06-02T14:00:00.095Z] [STRATEGY]   maxBundlePct: 15 → 15
+[2026-06-02T14:00:00.095Z] [STRATEGY]   managementIntervalMin: 3 → 3
+active: dump_spot
+  takeProfitPct: 4 → 5
+  trailingTriggerPct: 2.5 → 3
+  trailingDropPct: 1.5 → 2
+  stopLossPct: -5 → -4
+  outOfRangeWaitMinutes: 10 → 15
+  minMcap: 100000 → 200000
+  minTokenAgeHours: 6 → 12
+  maxTokenAgeHours: null → 48
+  minVolume: 1000 → 20000
+  minTokenFeesSol: 5 → 20
+  athFilterPct: -15 → -30
+  maxPriceChangePct: 10 → 25
+killing old PID: 1600107
+new PID: 1600270
+[switch done: 14:00:13Z]

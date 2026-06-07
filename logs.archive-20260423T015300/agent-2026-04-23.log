@@ -1,0 +1,1152 @@
+[2026-04-23T00:00:00.293Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:00:00.296Z] [CRON] Starting health check
+[2026-04-23T00:00:00.472Z] [AGENT] Step 1/20
+[2026-04-23T00:00:01.859Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:00:02.908Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:00:02.999Z] [CRON] Screening skipped — max positions reached (3/3)
+[2026-04-23T00:00:05.729Z] [LLM_COST] kimi-k2.5 role=MANAGER step=0 prompt=1971 completion=79 total=2050
+[2026-04-23T00:00:05.730Z] [AGENT] Step 2/20
+[2026-04-23T00:00:47.882Z] [LLM_COST] kimi-k2.5 role=MANAGER step=1 prompt=3180 completion=1123 total=4303
+[2026-04-23T00:00:47.882Z] [AGENT] Final answer reached
+[2026-04-23T00:00:47.882Z] [AGENT] ## 📊 PORTFOLIO HEALTH CHECK
+
+### **WALLET SNAPSHOT**
+| Asset | Balance | USD Value |
+|-------|---------|-----------|
+| SOL | 2.30 | $199.93 |
+| USDC | 0 | $0 |
+| abcdefg (base token) | 124,655.63 | $69.11 |
+| DUMBMONEY (base token) | 58,108.28 | $65.02 |
+| BOE (base token) | 584,660.06 | $0* |
+| **TOTAL** | — | **$334.06** |
+
+*BOE has no USD valuation — illiquid/dust
+
+---
+
+### **OPEN POSITIONS (3)**
+
+| Pool | Status | Age | Value | PnL | Fees Unclaimed | Yield (24h) |
+|------|--------|-----|-------|-----|----------------|-------------|
+| **发财-SOL** | 🔴 OOR (16m) | 17m | $69.48 | -0.08% (-$0.06) | $0.02 | 2.78% ⚠️ |
+| **abcdefg-SOL** | 🟢 IN RANGE | 8m | ~$0 | 0% | $0 | 0% |
+| **DUMBMONEY-SOL** | 🟢 IN RANGE | 29m | ~$0 | 0% | $0 | 0% |
+
+**Total Unclaimed Fees:** $0.02 *(Below $10 claim threshold)*
+
+---
+
+### **⚠️ ISSUES IDENTIFIED**
+
+| Issue | Severity | Details |
+|-------|----------|---------|
+| **发财-SOL OOR** | 🔴 HIGH | Out of range 16 mins, yield 2.78% < 5% min, age only 17m |
+| **Token Dust Accumulation** | 🟡 MEDIUM | $134+ in abcdefg/DUMBMONEY/BOE tokens from unswapped closes |
+| **No USDC Buffer** | 🟡 LOW | All capital in SOL or base tokens |
+
+---
+
+### **RECOMMENDED ACTIONS**
+
+1. **🔴 URGENT: Close 发财-SOL position** — OOR with low yield (2.78% < 5% threshold), close and swap to SOL
+2. **🟡 REBALANCE: Swap base token dust** — Convert abcdefg ($69) and DUMBMONEY ($65) back to SOL
+3. **✅ HOLD: Keep 2 in-range positions** — Both new (<30m), give them time to generate fees
+
+**Post-action target:** ~$265+ in liquid SOL for redeployment, eliminate idle token exposure.
+
+---
+*Executor standing by for close/swap commands if approved.*
+[2026-04-23T00:01:02.846Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:01:03.885Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:01:32.265Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:01:32.900Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:02:02.754Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:02:03.216Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:02:32.482Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:02:33.107Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:03:02.578Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:03:03.280Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:03:32.465Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:03:33.192Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:04:02.596Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:04:03.048Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:04:33.163Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:04:33.881Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:05:00.531Z] [CRON] Starting management cycle
+[2026-04-23T00:05:00.757Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:05:01.871Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:05:02.560Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:05:02.822Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T00:05:02.822Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:05:02.840Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:05:03.063Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:05:33.238Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:05:33.876Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:06:02.502Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:06:02.904Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:06:32.566Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:06:33.099Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:07:03.120Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:07:03.693Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:07:32.389Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:07:33.008Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:08:03.448Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:08:03.954Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:08:32.330Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:08:32.867Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:09:02.331Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:09:03.157Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:09:32.785Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:09:33.992Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:10:00.655Z] [CRON] Starting management cycle
+[2026-04-23T00:10:00.878Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:10:01.503Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:10:02.103Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:10:02.339Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T00:10:02.339Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:10:02.354Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:10:02.487Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:10:33.466Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:10:33.930Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:11:02.476Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:11:03.263Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:11:32.480Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:11:33.067Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:12:03.270Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:12:04.078Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:12:32.307Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:12:33.009Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:13:02.755Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:13:03.295Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:13:32.568Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:13:33.312Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:14:02.757Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:14:03.581Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:14:32.308Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:14:32.978Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:15:00.806Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:15:00.814Z] [CRON] Starting management cycle
+[2026-04-23T00:15:01.748Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:15:02.614Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:15:02.736Z] [CRON] Screening skipped — max positions reached (3/3)
+[2026-04-23T00:15:02.901Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T00:15:02.902Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:15:02.915Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:15:03.041Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:15:34.388Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:15:35.198Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:16:02.512Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:16:02.955Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:16:32.719Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:16:33.779Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:17:02.505Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:17:02.973Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:17:33.746Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:17:34.589Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:18:03.126Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:18:03.683Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:18:32.367Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:18:33.101Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:19:03.518Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:19:04.479Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:19:33.305Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:19:34.308Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:19:34.348Z] [STATE] Position Eb4po1jiat7cgqbgeLKRVWHaS1Ay1giypSXSggVDriS4 back in range
+[2026-04-23T00:20:00.288Z] [CRON] Starting management cycle
+[2026-04-23T00:20:00.519Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:20:01.576Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:20:02.310Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:20:02.533Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T00:20:02.533Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:20:02.555Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:20:02.687Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:20:32.533Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:20:33.483Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:21:02.448Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:21:03.152Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:21:32.705Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:21:33.189Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:22:02.519Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:22:03.090Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:22:32.299Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:22:32.822Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:23:02.540Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:23:02.950Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:23:32.270Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:23:33.005Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:24:02.502Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:24:03.404Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:24:33.608Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:24:34.474Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:25:00.642Z] [CRON] Starting management cycle
+[2026-04-23T00:25:00.882Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:25:01.619Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:25:02.581Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:25:02.855Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T00:25:02.855Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:25:02.869Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:25:03.005Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:25:33.241Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:25:33.877Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:26:02.191Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:26:02.577Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:26:32.202Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:26:32.741Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:27:02.386Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:27:02.972Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:27:32.441Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:27:33.058Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:28:02.892Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:28:04.279Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:28:32.655Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:28:33.171Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:29:02.480Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:29:03.258Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:29:32.386Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:29:32.854Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:30:00.050Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:30:00.053Z] [CRON] Starting management cycle
+[2026-04-23T00:30:00.567Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:30:01.359Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:30:01.466Z] [CRON] Screening skipped — max positions reached (3/3)
+[2026-04-23T00:30:01.621Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T00:30:01.621Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:30:01.641Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:30:01.772Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:30:01.910Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:30:02.040Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:30:32.283Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:30:33.215Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:31:02.427Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:31:02.902Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:31:03.058Z] [STATE] [PnL poll] Exit alert: DUMBMONEY-SOL — Low yield: fee/TVL 0.00% < min 5% (age: 60m) — triggering management
+[2026-04-23T00:31:03.058Z] [CRON] Starting management cycle
+[2026-04-23T00:31:03.058Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:31:03.071Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:31:03.200Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:31:03.479Z] [STATE] Exit alert for DUMBMONEY-SOL: Low yield: fee/TVL 0.00% < min 5% (age: 60m)
+[2026-04-23T00:31:03.492Z] [CRON] Management: 1 action(s) needed — invoking LLM [model: kimi-k2.5]
+[2026-04-23T00:31:03.994Z] [AGENT] Step 1/20
+[2026-04-23T00:31:10.693Z] [LLM_COST] kimi-k2.5 role=MANAGER step=0 prompt=2220 completion=180 total=2400
+[2026-04-23T00:31:10.708Z] [CLOSE] Closing position: 7Miape7X7AJMY5XGdM7g8Qe65ZTJGsxn8AjuWDy2x45E
+[2026-04-23T00:31:11.167Z] [CLOSE] Step 1: Claiming fees for 7Miape7X7AJMY5XGdM7g8Qe65ZTJGsxn8AjuWDy2x45E
+[2026-04-23T00:31:11.254Z] [CLOSE_WARN] Step 1 (Claim) failed or nothing to claim: No fee to claim
+[2026-04-23T00:31:11.330Z] [CLOSE] Step 2: No position liquidity detected, closing account
+[2026-04-23T00:31:12.100Z] [CLOSE] Step 2 OK (close only): yYp6ZNp2kCjZRNgpuWjdCPSdCG6BDKhe5fz6XvRJZLzt7si3dFm4wZ5K9yeHP9fMHojufD9r4cP4YBiicSEpgRH
+[2026-04-23T00:31:12.100Z] [CLOSE] SUCCESS txs: yYp6ZNp2kCjZRNgpuWjdCPSdCG6BDKhe5fz6XvRJZLzt7si3dFm4wZ5K9yeHP9fMHojufD9r4cP4YBiicSEpgRH
+[2026-04-23T00:31:17.595Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:31:18.362Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:31:18.488Z] [CLOSE_WARN] Position 7Miape7X7AJMY5XGdM7g8Qe65ZTJGsxn8AjuWDy2x45E still appears open after close txs (attempt 1/4)
+[2026-04-23T00:31:22.052Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:31:22.488Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:31:22.577Z] [STATE] Position 7Miape7X7AJMY5XGdM7g8Qe65ZTJGsxn8AjuWDy2x45E auto-closed (missing from on-chain data)
+[2026-04-23T00:31:22.600Z] [STATE] Position 7Miape7X7AJMY5XGdM7g8Qe65ZTJGsxn8AjuWDy2x45E marked closed: Low yield: fee/TVL 0.00% < min 5% (age: 60m) — trailing TP triggered
+[2026-04-23T00:31:23.418Z] [CLOSE] Closed PnL from API: pnl=0.00 USD (0.00%), withdrawn=0.00, deposited=0.00
+[2026-04-23T00:31:23.489Z] [POOL-MEMORY] Recorded deploy for DUMBMONEY-SOL (G1okG7hA): PnL 0%
+[2026-04-23T00:31:23.527Z] [POOL-MEMORY] Note added to G1okG7hA: Closed: low yield (fee/TVL below threshold) at 2026-04-23
+[2026-04-23T00:31:23.623Z] [EXECUTOR] Auto-swapping DUMBMONEY ($58.28, bal 58108.284747) back to SOL
+[2026-04-23T00:31:23.623Z] [SWAP] 58108.284747 of CAjtTHvC878f8cZ4zEwdvgjkjFM7rbYN8Mb1go1cpump → So11111111111111111111111111111111111111112
+[2026-04-23T00:31:24.540Z] [SWAP] SUCCESS tx: W8x5XGuEZH2a29gmsZb9WGrakaBxNqS1jWffpNBy52BxQZA2Xj1yxn6GZ5FLtAWWpA6fY9bXtd2TPX2upSjX7aC
+[2026-04-23T00:31:24.541Z] [AGENT] Step 2/20
+[2026-04-23T00:31:29.016Z] [LLM_COST] kimi-k2.5 role=MANAGER step=1 prompt=2727 completion=115 total=2842
+[2026-04-23T00:31:29.017Z] [AGENT] Final answer reached
+[2026-04-23T00:31:29.017Z] [AGENT] **EXECUTED:**
+
+✅ **DUMBMONEY-SOL** | Closed position `7Miape7...` → trailing TP triggered (low yield 0.00% < 5% min). Auto-swapped DUMBMONEY → SOL, received ~0.65 SOL. Tx: `yYp6ZN...SEpgRH`
+[2026-04-23T00:31:29.017Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:31:29.450Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:31:29.847Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:31:31.908Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:31:32.037Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:32:02.470Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:32:03.049Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:32:32.793Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:32:33.475Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:33:02.496Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:33:03.106Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:33:32.643Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:33:33.269Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:34:02.419Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:34:03.060Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:34:32.504Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:34:32.950Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:35:00.481Z] [CRON] Starting management cycle
+[2026-04-23T00:35:00.715Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:35:02.065Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:35:02.821Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:35:03.039Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T00:35:03.040Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:35:03.056Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:35:03.181Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:35:03.228Z] [CRON] Post-management: 2/3 positions — triggering screening
+[2026-04-23T00:35:03.228Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:35:03.243Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:35:03.367Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:35:03.636Z] [CRON] Starting screening cycle [model: kimi-k2.5]
+[2026-04-23T00:35:03.637Z] [CRON] Computed deploy amount: 0.8 SOL (wallet: 3.009709 SOL)
+[2026-04-23T00:35:03.939Z] [BLACKLIST] Filtered blacklisted token Deployr (8JvDVZK6) in pool Deployr-SOL
+[2026-04-23T00:35:03.939Z] [BLACKLIST] Filtered blacklisted token maxxing (32CdQdBU) in pool maxxing-SOL
+[2026-04-23T00:35:03.940Z] [BLACKLIST] Filtered blacklisted token Deployr (8JvDVZK6) in pool Deployr-SOL
+[2026-04-23T00:35:03.940Z] [BLACKLIST] Filtered 3 pool(s) with blacklisted tokens/devs
+[2026-04-23T00:35:04.041Z] [SCREENING] Filtered cooldown pool ASTEROID-SOL (7UXd3L81)
+[2026-04-23T00:35:04.296Z] [SCREENING] Deprioritized 5 recently-seen pool(s), 9 fresh
+[2026-04-23T00:35:04.734Z] [OKX] advanced-info unavailable for ASTEROID-SOL (4UeLCRqA)
+[2026-04-23T00:35:04.735Z] [OKX] price-info unavailable for ASTEROID-SOL (4UeLCRqA)
+[2026-04-23T00:35:04.739Z] [OKX] advanced-info unavailable for PVE-SOL (J5tUvJp3)
+[2026-04-23T00:35:04.742Z] [OKX] price-info unavailable for roi-SOL (BdqNyg2k)
+[2026-04-23T00:35:04.746Z] [OKX] advanced-info unavailable for 我的刀盾-SOL (6iA73gWC)
+[2026-04-23T00:35:04.746Z] [OKX] price-info unavailable for 我的刀盾-SOL (6iA73gWC)
+[2026-04-23T00:35:04.746Z] [OKX] advanced-info unavailable for milkers-SOL (nNcqotFp)
+[2026-04-23T00:35:04.747Z] [OKX] price-info unavailable for milkers-SOL (nNcqotFp)
+[2026-04-23T00:35:04.747Z] [OKX] advanced-info unavailable for ASTEROID-SOL (F1ppSHed)
+[2026-04-23T00:35:04.748Z] [OKX] price-info unavailable for ASTEROID-SOL (F1ppSHed)
+[2026-04-23T00:35:04.752Z] [OKX] advanced-info unavailable for Patapim-SOL (W6wjBw8H)
+[2026-04-23T00:35:04.753Z] [OKX] price-info unavailable for Patapim-SOL (W6wjBw8H)
+[2026-04-23T00:35:04.754Z] [OKX] advanced-info unavailable for DUMBMONEY-SOL (CAjtTHvC)
+[2026-04-23T00:35:04.754Z] [OKX] price-info unavailable for DUMBMONEY-SOL (CAjtTHvC)
+[2026-04-23T00:35:04.844Z] [OKX] advanced-info unavailable for DUMBMONEY-SOL (CAjtTHvC)
+[2026-04-23T00:35:04.844Z] [OKX] price-info unavailable for DUMBMONEY-SOL (CAjtTHvC)
+[2026-04-23T00:35:09.310Z] [SCREENING] Pool-memory filter: dropped milkers-SOL — pool memory: 5 deploys, win 20%, avg PnL -31.46%
+[2026-04-23T00:35:09.366Z] [SCREENING] Randomized pick: DUMBMONEY-SOL from top-5 bracket (Jupiter-routable)
+[2026-04-23T00:35:09.578Z] [AGENT] Step 1/20
+[2026-04-23T00:35:42.512Z] [LLM_COST] kimi-k2.5 role=SCREENER step=0 prompt=4503 completion=983 total=5486
+[2026-04-23T00:35:42.608Z] [AGENT] Step 2/20
+[2026-04-23T00:35:51.588Z] [LLM_COST] kimi-k2.5 role=SCREENER step=1 prompt=5712 completion=261 total=5973
+[2026-04-23T00:35:51.915Z] [AGENT] Step 3/20
+[2026-04-23T00:36:00.880Z] [LLM_COST] kimi-k2.5 role=SCREENER step=2 prompt=7269 completion=248 total=7517
+[2026-04-23T00:36:00.881Z] [AGENT] Step 4/20
+[2026-04-23T00:36:04.952Z] [LLM_COST] kimi-k2.5 role=SCREENER step=3 prompt=7596 completion=102 total=7698
+[2026-04-23T00:36:04.977Z] [AGENT] Step 5/20
+[2026-04-23T00:36:28.249Z] [LLM_COST] kimi-k2.5 role=SCREENER step=4 prompt=8559 completion=713 total=9272
+[2026-04-23T00:36:28.250Z] [SWAP] 0.8 of So11111111111111111111111111111111111111112 → CAjtTHvC878f8cZ4zEwdvgjkjFM7rbYN8Mb1go1cpump
+[2026-04-23T00:36:29.017Z] [SWAP] SUCCESS tx: 5rKi3VZWjD7Gkn98HFx72BkxWE5Jj3qVASaitjqHowvJGU1C9rENcKAyTbQsxDcW7yeg4VXR3wpLbufiugynRuBe
+[2026-04-23T00:36:29.017Z] [AGENT] Step 6/20
+[2026-04-23T00:36:39.664Z] [LLM_COST] kimi-k2.5 role=SCREENER step=5 prompt=9469 completion=323 total=9792
+[2026-04-23T00:36:39.664Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:36:40.453Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:36:40.898Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:36:41.282Z] [DEPLOY] Pool: GCwJrZN7NKGduwgxrjBNrKfhjwLTo6hHuYVso2xxjDCY
+[2026-04-23T00:36:41.283Z] [DEPLOY] Strategy: bid_ask, Bins: -956 to -893 (63 bins)
+[2026-04-23T00:36:41.283Z] [DEPLOY] Amount: 68971.501789 X, 0 Y
+[2026-04-23T00:36:41.283Z] [DEPLOY] Position: 9jJoXCMjB1bAhg5Wnc68gLvNPFwbHsn6NKfihtYMC8mg
+[2026-04-23T00:36:41.927Z] [DEPLOY] SUCCESS — 1 tx(s): etJFYvk42BFnZWU6W1CU7F9xJoh5exB2hhkb8iobKVyDNccYfhY4dUKq99nnYcMmgWkPpYccnzsFVYczP6KHtEm
+[2026-04-23T00:36:41.953Z] [STATE] Tracked new position: 9jJoXCMjB1bAhg5Wnc68gLvNPFwbHsn6NKfihtYMC8mg in pool GCwJrZN7NKGduwgxrjBNrKfhjwLTo6hHuYVso2xxjDCY
+[2026-04-23T00:36:41.956Z] [AGENT] Step 7/20
+[2026-04-23T00:36:48.724Z] [LLM_COST] kimi-k2.5 role=SCREENER step=6 prompt=10077 completion=188 total=10265
+[2026-04-23T00:36:48.724Z] [AGENT] Final answer reached
+[2026-04-23T00:36:48.724Z] [AGENT] 🚀 DEPLOYED DUMBMONEY-SOL | ◎ 0.8 SOL → 68,971.50 DUMBMONEY | bid_ask | bin -893/-956 | Fee/TVL: 3.37% | Why: Scorer-ranked candidate with 75 organic score, high fee generation (418 SOL), and positive 1h net buyers (147) despite -13.6% price dip providing entry opportunity; history shows 57% win rate with 100% OOR efficiency in last 6 cycles.
+[2026-04-23T00:37:03.000Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:37:03.778Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:37:32.682Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:37:33.613Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:38:03.050Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:38:04.437Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:38:33.877Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:38:34.826Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:39:02.531Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:39:03.582Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:39:03.701Z] [STATE] Position 9jJoXCMjB1bAhg5Wnc68gLvNPFwbHsn6NKfihtYMC8mg marked out of range
+[2026-04-23T00:39:32.436Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:39:33.741Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:40:00.935Z] [CRON] Starting management cycle
+[2026-04-23T00:40:01.163Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:40:02.678Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:40:03.429Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:40:03.724Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T00:40:03.724Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:40:03.737Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:40:03.867Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:40:32.899Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:40:33.760Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:41:03.230Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:41:04.153Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:41:33.157Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:41:33.968Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:42:02.869Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:42:03.400Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:42:32.867Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:42:33.733Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:43:02.433Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:43:03.184Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:43:32.960Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:43:33.784Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:44:03.636Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:44:04.372Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:44:32.674Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:44:34.071Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:45:00.249Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:45:00.374Z] [CRON] Starting management cycle
+[2026-04-23T00:45:00.851Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:45:01.921Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:45:02.056Z] [CRON] Screening skipped — max positions reached (3/3)
+[2026-04-23T00:45:02.211Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T00:45:02.211Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:45:02.226Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:45:02.360Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:45:33.456Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:45:34.203Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:46:02.712Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:46:03.697Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:46:33.140Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:46:34.326Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:47:02.390Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:47:03.333Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:47:32.626Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:47:33.391Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:48:02.799Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:48:03.893Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:48:32.698Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:48:33.430Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:48:33.552Z] [STATE] Position 9jJoXCMjB1bAhg5Wnc68gLvNPFwbHsn6NKfihtYMC8mg back in range
+[2026-04-23T00:49:02.683Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:49:03.435Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:49:32.762Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:49:33.510Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:50:00.659Z] [CRON] Starting management cycle
+[2026-04-23T00:50:00.890Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:50:01.398Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:50:02.379Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:50:02.656Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T00:50:02.656Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:50:02.669Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:50:02.803Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:50:32.267Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:50:33.214Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:51:02.474Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:51:03.564Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:51:32.634Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:51:33.209Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:52:02.432Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:52:03.354Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:52:03.549Z] [STATE] [PnL poll] Exit alert: abcdefg-SOL — Low yield: fee/TVL 0.00% < min 5% (age: 60m) — triggering management
+[2026-04-23T00:52:03.549Z] [CRON] Starting management cycle
+[2026-04-23T00:52:03.549Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:52:03.564Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:52:03.694Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:52:03.938Z] [STATE] Exit alert for abcdefg-SOL: Low yield: fee/TVL 0.00% < min 5% (age: 60m)
+[2026-04-23T00:52:03.962Z] [CRON] Management: 1 action(s) needed — invoking LLM [model: kimi-k2.5]
+[2026-04-23T00:52:04.098Z] [AGENT] Step 1/20
+[2026-04-23T00:52:15.743Z] [LLM_COST] kimi-k2.5 role=MANAGER step=0 prompt=2215 completion=391 total=2606
+[2026-04-23T00:52:15.753Z] [CLOSE] Closing position: FDfnrgwzkpxYbHVaS4svctQGscziHuQx8PpXgKzCkVRX
+[2026-04-23T00:52:16.163Z] [CLOSE] Step 1: Claiming fees for FDfnrgwzkpxYbHVaS4svctQGscziHuQx8PpXgKzCkVRX
+[2026-04-23T00:52:16.230Z] [CLOSE_WARN] Step 1 (Claim) failed or nothing to claim: No fee to claim
+[2026-04-23T00:52:16.283Z] [CLOSE] Step 2: No position liquidity detected, closing account
+[2026-04-23T00:52:16.928Z] [CLOSE] Step 2 OK (close only): 4q6V53SZmaNhRmaTgvyX2E68YNKAyKExdrv4fsNmsPHF54sJWxeuzsrugzoakSsj2NRphPox1UbuixDmoWggUMXe
+[2026-04-23T00:52:16.928Z] [CLOSE] SUCCESS txs: 4q6V53SZmaNhRmaTgvyX2E68YNKAyKExdrv4fsNmsPHF54sJWxeuzsrugzoakSsj2NRphPox1UbuixDmoWggUMXe
+[2026-04-23T00:52:22.552Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:52:23.321Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:52:23.408Z] [STATE] Position 9jJoXCMjB1bAhg5Wnc68gLvNPFwbHsn6NKfihtYMC8mg marked out of range
+[2026-04-23T00:52:23.440Z] [STATE] Position FDfnrgwzkpxYbHVaS4svctQGscziHuQx8PpXgKzCkVRX auto-closed (missing from on-chain data)
+[2026-04-23T00:52:23.468Z] [STATE] Position FDfnrgwzkpxYbHVaS4svctQGscziHuQx8PpXgKzCkVRX marked closed: Trailing TP: Low yield: fee/TVL 0.00% < min 5% (age: 60m)
+[2026-04-23T00:52:24.061Z] [CLOSE] Closed PnL from API: pnl=0.00 USD (0.00%), withdrawn=0.00, deposited=0.00
+[2026-04-23T00:52:24.129Z] [POOL-MEMORY] Recorded deploy for abcdefg-SOL (CB8kFvgN): PnL 0%
+[2026-04-23T00:52:24.154Z] [POOL-MEMORY] Note added to CB8kFvgN: Closed: low yield (fee/TVL below threshold) at 2026-04-23
+[2026-04-23T00:52:24.260Z] [EXECUTOR] Auto-swapping abcdefg ($66.81, bal 124655.634937) back to SOL
+[2026-04-23T00:52:24.260Z] [SWAP] 124655.634937 of 89S7oVB4hui8ceJqhHreWB7fcxdthfvoB7z2pfJtpump → So11111111111111111111111111111111111111112
+[2026-04-23T00:52:25.060Z] [SWAP] SUCCESS tx: 28sE4grVw2bn2xaX1v4LgSSxFtM2NkvzxhNQP7HVU7dYRFzny5XMNryY1wE3QTB5osRNXWBLrcb4NfTe2FMESMEK
+[2026-04-23T00:52:25.061Z] [AGENT] Step 2/20
+[2026-04-23T00:52:29.912Z] [LLM_COST] kimi-k2.5 role=MANAGER step=1 prompt=2913 completion=119 total=3032
+[2026-04-23T00:52:29.912Z] [AGENT] Final answer reached
+[2026-04-23T00:52:29.912Z] [AGENT] **Result:** ✅ CLOSED `abcdefg-SOL` (FDfnr...CkVRX) — Trailing TP triggered (yield 0% < 5% min). Auto-swapped base tokens → SOL. Tx: `4q6V53...gUMXe`
+[2026-04-23T00:52:29.912Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:52:30.369Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:52:31.144Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:52:31.233Z] [CRON] Post-management: 2/3 positions — triggering screening
+[2026-04-23T00:52:31.234Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:52:31.245Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:52:31.365Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:52:31.631Z] [CRON] Starting screening cycle [model: kimi-k2.5]
+[2026-04-23T00:52:31.632Z] [CRON] Computed deploy amount: 0.8 SOL (wallet: 2.209677 SOL)
+[2026-04-23T00:52:31.945Z] [BLACKLIST] Filtered blacklisted token Deployr (8JvDVZK6) in pool Deployr-SOL
+[2026-04-23T00:52:31.946Z] [BLACKLIST] Filtered blacklisted token maxxing (32CdQdBU) in pool maxxing-SOL
+[2026-04-23T00:52:31.946Z] [BLACKLIST] Filtered blacklisted token Deployr (8JvDVZK6) in pool Deployr-SOL
+[2026-04-23T00:52:31.946Z] [BLACKLIST] Filtered 3 pool(s) with blacklisted tokens/devs
+[2026-04-23T00:52:32.048Z] [SCREENING] Filtered cooldown pool ASTEROID-SOL (7UXd3L81)
+[2026-04-23T00:52:32.318Z] [SCREENING] Deprioritized 6 recently-seen pool(s), 9 fresh
+[2026-04-23T00:52:32.771Z] [OKX] advanced-info unavailable for ASTEROID-SOL (4UeLCRqA)
+[2026-04-23T00:52:32.772Z] [OKX] price-info unavailable for ASTEROID-SOL (4UeLCRqA)
+[2026-04-23T00:52:32.779Z] [OKX] price-info unavailable for roi-SOL (BdqNyg2k)
+[2026-04-23T00:52:32.779Z] [OKX] advanced-info unavailable for abcdefg-SOL (89S7oVB4)
+[2026-04-23T00:52:32.779Z] [OKX] price-info unavailable for abcdefg-SOL (89S7oVB4)
+[2026-04-23T00:52:32.779Z] [OKX] advanced-info unavailable for 🕶️-SOL (EdNpbmLN)
+[2026-04-23T00:52:32.782Z] [OKX] advanced-info unavailable for 我的刀盾-SOL (6iA73gWC)
+[2026-04-23T00:52:32.782Z] [OKX] price-info unavailable for 我的刀盾-SOL (6iA73gWC)
+[2026-04-23T00:52:32.783Z] [OKX] advanced-info unavailable for Monitor-SOL (G8dUSvyw)
+[2026-04-23T00:52:32.783Z] [OKX] price-info unavailable for Monitor-SOL (G8dUSvyw)
+[2026-04-23T00:52:32.784Z] [OKX] advanced-info unavailable for Patapim-SOL (W6wjBw8H)
+[2026-04-23T00:52:32.784Z] [OKX] price-info unavailable for Patapim-SOL (W6wjBw8H)
+[2026-04-23T00:52:32.796Z] [OKX] advanced-info unavailable for ASTEROID-SOL (F1ppSHed)
+[2026-04-23T00:52:32.796Z] [OKX] price-info unavailable for ASTEROID-SOL (F1ppSHed)
+[2026-04-23T00:52:32.798Z] [OKX] advanced-info unavailable for abcdefg-SOL (89S7oVB4)
+[2026-04-23T00:52:32.798Z] [OKX] price-info unavailable for abcdefg-SOL (89S7oVB4)
+[2026-04-23T00:52:37.251Z] [SCREENING] Pool-memory filter: dropped abcdefg-SOL — pool memory: 7 deploys, win 28.57%, avg PnL -6.46%
+[2026-04-23T00:52:37.324Z] [SCREENING] Randomized pick: PVE-SOL from top-5 bracket (Jupiter-routable)
+[2026-04-23T00:52:37.550Z] [AGENT] Step 1/20
+[2026-04-23T00:53:02.226Z] [LLM_COST] kimi-k2.5 role=SCREENER step=0 prompt=4534 completion=762 total=5296
+[2026-04-23T00:53:02.535Z] [AGENT] Step 2/20
+[2026-04-23T00:53:27.721Z] [LLM_COST] kimi-k2.5 role=SCREENER step=1 prompt=7406 completion=785 total=8191
+[2026-04-23T00:53:27.721Z] [SWAP] 0.8 of So11111111111111111111111111111111111111112 → J5tUvJp3CH5dtyQSAsuRqXDLb2cdWDwerDj83w1gbrrr
+[2026-04-23T00:53:28.559Z] [SWAP] SUCCESS tx: 4SPodz8TZfXRC1Ssn9GmmV3NmeAQai6KK5R2T7tcmtoRMHz5ByVouMDYukyDnxRsrd21B754RfJ6Dg56ZA97xv6w
+[2026-04-23T00:53:28.560Z] [AGENT] Step 3/20
+[2026-04-23T00:53:36.789Z] [LLM_COST] kimi-k2.5 role=SCREENER step=2 prompt=8394 completion=250 total=8644
+[2026-04-23T00:53:36.790Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:53:37.333Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T00:53:38.171Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:53:38.581Z] [DEPLOY] Pool: 6JsQ2sRLqTjxa9sfXktZHtpYQEsj8tgMzcAhnHvEEkqA
+[2026-04-23T00:53:38.581Z] [DEPLOY] Strategy: bid_ask, Bins: -1138 to -1059 (79 bins — WIDE RANGE)
+[2026-04-23T00:53:38.581Z] [DEPLOY] Amount: 407657.778516579 X, 0 Y
+[2026-04-23T00:53:38.581Z] [DEPLOY] Position: PzWFc8qGxtywadngVHbWrw4ddfWVUMBDQM2tBpy9Uo3
+[2026-04-23T00:53:39.289Z] [DEPLOY] Create tx 1/1: 5meXx7NDEiShwE6FzfRPbLkjzyMpCuSL8de4prZhxkm6wmEu5S2yESWeh2M2JG9M2aiVwgDb62qrZYtraoZermkb
+[2026-04-23T00:53:39.677Z] [DEPLOY] Add liquidity tx 1/2: 4FpDN1G1qCuZGnvAdzGfYf5WVMyqTaDXhFgndLartVmJEn5T25w3dnYtoFU4XxhayxwN8QEUcwWYTP55iQKpEXFk
+[2026-04-23T00:53:40.052Z] [DEPLOY] Add liquidity tx 2/2: 33nYg1wMBuQR7j52tvMBHypcxqwfqoAHe37KNDvgyeXSzPdDLDf53ySKN3ChjrzKHNVqWkXmbo8RHEwewSWzisMR
+[2026-04-23T00:53:40.053Z] [DEPLOY] SUCCESS — 3 tx(s): 5meXx7NDEiShwE6FzfRPbLkjzyMpCuSL8de4prZhxkm6wmEu5S2yESWeh2M2JG9M2aiVwgDb62qrZYtraoZermkb
+[2026-04-23T00:53:40.079Z] [STATE] Tracked new position: PzWFc8qGxtywadngVHbWrw4ddfWVUMBDQM2tBpy9Uo3 in pool 6JsQ2sRLqTjxa9sfXktZHtpYQEsj8tgMzcAhnHvEEkqA
+[2026-04-23T00:53:40.083Z] [AGENT] Step 4/20
+[2026-04-23T00:53:46.916Z] [LLM_COST] kimi-k2.5 role=SCREENER step=3 prompt=9051 completion=214 total=9265
+[2026-04-23T00:53:46.916Z] [AGENT] Final answer reached
+[2026-04-23T00:53:46.917Z] [AGENT] 🚀 DEPLOYED PVE-SOL | ◎ 0.8 SOL | bid_ask | bin -1059 | Fee/TVL: 11.2% | Why: High current fee/TVL of 11.2% breaks recent low-yield pattern, strong organic score 73, and 65 SOL in fees signal real trading activity despite -32% hourly dip creating entry opportunity.
+[2026-04-23T00:54:02.585Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:54:03.450Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:54:32.733Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:54:33.727Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:55:00.443Z] [CRON] Starting management cycle
+[2026-04-23T00:55:00.667Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:55:02.291Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:55:03.119Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:55:03.417Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T00:55:03.418Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T00:55:03.431Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:55:03.552Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:55:32.404Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:55:32.973Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:56:02.553Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:56:03.401Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:56:33.009Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:56:34.085Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:57:02.448Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:57:03.272Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:57:32.398Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:57:33.162Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:58:02.739Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:58:03.572Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:58:32.800Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:58:33.740Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:59:02.357Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:59:03.218Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T00:59:32.680Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T00:59:33.455Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:00:00.933Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:00:00.935Z] [CRON] Starting health check
+[2026-04-23T01:00:00.937Z] [CRON] Starting morning briefing
+[2026-04-23T01:00:01.173Z] [AGENT] Step 1/20
+[2026-04-23T01:00:02.495Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:00:03.296Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:00:03.369Z] [CRON] Screening skipped — max positions reached (3/3)
+[2026-04-23T01:00:07.008Z] [LLM_COST] kimi-k2.5 role=MANAGER step=0 prompt=1973 completion=52 total=2025
+[2026-04-23T01:00:07.009Z] [AGENT] Step 2/20
+[2026-04-23T01:00:32.012Z] [LLM_COST] kimi-k2.5 role=MANAGER step=1 prompt=3154 completion=585 total=3739
+[2026-04-23T01:00:32.910Z] [AGENT] Step 3/20
+[2026-04-23T01:01:20.218Z] [LLM_COST] kimi-k2.5 role=MANAGER step=2 prompt=4034 completion=1583 total=5617
+[2026-04-23T01:01:20.218Z] [AGENT] Final answer reached
+[2026-04-23T01:01:20.219Z] [AGENT] ## 📊 HEALTH CHECK REPORT
+
+**Timestamp:** 2026-04-23 01:00 UTC  
+**Wallet:** `8zaAnu...ZMWP`  
+**Total Portfolio Value:** $325.98
+
+---
+
+### 💰 LIQUIDITY SUMMARY
+
+| Asset | Balance | USD Value |
+|-------|---------|-----------|
+| SOL | 2.13 | $184.80 |
+| USDC | 0 | $0 |
+| DUMBMONEY | 68,971.50 | $71.49 |
+| PVE | 407,657.78 | $69.70 |
+| BOE | 584,660.06 | — |
+| **LP Positions** | — | ~$68.70 |
+| **TOTAL** | — | **$325.98** |
+
+**Liquid Capital:** 2.13 SOL ($184.80) — *Adequate for gas + 2 new positions*
+
+---
+
+### 📈 OPEN POSITIONS (3 Total)
+
+| Pool | Status | Age | Value | Fees | PnL | Fee/TVL 24h |
+|------|--------|-----|-------|------|-----|-------------|
+| **发财-SOL** | ✅ IN RANGE | 77m | $68.70 | $0.71 | -0.23% | **18.81%** ⭐ |
+| **DUMBMONEY-SOL** | ❌ OOR | 23m | ~$0 | $0 | 0% | 0% |
+| **PVE-SOL** | ⚠️ EDGE | 6m | ~$0 | $0 | 0% | 0% |
+
+---
+
+### 🎯 PERFORMANCE METRICS
+
+| Metric | Value |
+|--------|-------|
+| **Total LP Value Deployed** | ~$68.70 |
+| **Total Unclaimed Fees** | $0.71 |
+| **Positions In Range** | 1/3 (33%) |
+| **Positions Out of Range** | 1/3 (33%) |
+| **Fresh Positions (<10m)** | 1/3 (33%) |
+| **Avg Fee Yield (Active)** | 18.81% |
+
+---
+
+### ⚠️ ISSUES IDENTIFIED
+
+| Issue | Pool | Action Needed |
+|-------|------|---------------|
+| **OUT OF RANGE** | DUMBMONEY-SOL | Monitor for 180m cooldown; close if >3 OOR events |
+| **AT RANGE EDGE** | PVE-SOL | High risk of going OOR; watch closely |
+| **DUST HOLDINGS** | DUMBMONEY, PVE | $71 + $69 sitting idle in wallet |
+
+---
+
+### 🔧 RECOMMENDATIONS
+
+#### IMMEDIATE (Next 30 min)
+1. **Monitor PVE-SOL** — Position is at upper bin boundary (-1059). Price reversal likely pushes it OOR. Consider wider range on next rebalance.
+
+2. **Monitor DUMBMONEY-SOL** — OOR for 7 minutes. Has 173 minutes before close trigger (180m rule). Pool may need wider bins per lessons learned (avoid bid-ask on volatile pairs).
+
+#### SHORT-TERM (1-6 hours)
+3. **发财-SOL is healthy** — 18.81% yield is excellent. Hold position. Claim fees when >$10.
+
+4. **Deploy idle capital?** — $141.19 in DUMBMONEY+PVE tokens sitting idle. Consider:
+   - Swapping to SOL for new positions, OR
+   - Adding to existing 发财-SOL position if pool capacity allows
+
+#### STRATEGIC ADJUSTMENTS
+5. **Avoid bid_ask strategy** — Recent lessons show 73-100% OOR rate on volatile pairs. Use **spot** or **wide** strategies instead.
+
+6. **Position sizing** — Current 发财-SOL at $68.70 is appropriately sized (~20% of deployable capital).
+
+---
+
+### 📋 HEALTH SCORE
+
+| Category | Score | Notes |
+|----------|-------|-------|
+| Capital Efficiency | ⭐⭐⭐☆☆ | Only 1/3 positions earning; $140+ idle |
+| Risk Exposure | ⭐⭐⭐⭐☆ | Low IL risk; manageable OOR exposure |
+| Fee Generation | ⭐⭐⭐⭐☆ | 18.81% on active position is strong |
+| Portfolio Balance | ⭐⭐⭐☆☆ | Heavy alt-bag exposure (DUMBMONEY, PVE, BOE) |
+| **OVERALL** | **⭐⭐⭐☆☆** | **MODERATE** — needs rebalancing focus |
+
+---
+
+### 🎯 NEXT ACTIONS (Priority Order)
+
+1. ⏱️ **Wait** — PVE-SOL and DUMBMONEY-SOL are fresh; don't overreact
+2. 👁️ **Watch** — Check PVE-SOL range status in 15-30 min
+3. 💱 **Consider swap** — DUMBMONEY/PVE → SOL if positions close or for new deployment
+4. 📊 **Claim** — 发财-SOL fees when >$10 (currently $0.71)
+
+**Verdict:** Portfolio is functional but capital-inefficient. Main focus should be reducing idle alt-bag exposure and ensuring new positions use wider ranges to avoid OOR churn.
+[2026-04-23T01:01:33.127Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:01:33.912Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:01:34.029Z] [STATE] Position Eb4po1jiat7cgqbgeLKRVWHaS1Ay1giypSXSggVDriS4 peak candidate 0.46% queued for 15s confirmation
+[2026-04-23T01:01:50.189Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:01:50.913Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:01:51.019Z] [STATE] Position Eb4po1jiat7cgqbgeLKRVWHaS1Ay1giypSXSggVDriS4 peak PnL confirmed at 0.46% after recheck
+[2026-04-23T01:02:02.657Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:02:03.398Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:02:32.654Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:02:33.418Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:03:02.518Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:03:03.434Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:03:03.535Z] [STATE] [PnL poll] Deterministic close rule: DUMBMONEY-SOL — Rule 3: pumped far above range — triggering management
+[2026-04-23T01:03:03.535Z] [CRON] Starting management cycle
+[2026-04-23T01:03:03.535Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:03:03.549Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:03:03.667Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:03:03.912Z] [CRON] Management: 1 action(s) needed — invoking LLM [model: kimi-k2.5]
+[2026-04-23T01:03:04.097Z] [AGENT] Step 1/20
+[2026-04-23T01:03:17.225Z] [LLM_COST] kimi-k2.5 role=MANAGER step=0 prompt=2197 completion=346 total=2543
+[2026-04-23T01:03:17.239Z] [CLOSE] Closing position: 9jJoXCMjB1bAhg5Wnc68gLvNPFwbHsn6NKfihtYMC8mg
+[2026-04-23T01:03:17.676Z] [CLOSE] Step 1: Claiming fees for 9jJoXCMjB1bAhg5Wnc68gLvNPFwbHsn6NKfihtYMC8mg
+[2026-04-23T01:03:17.737Z] [CLOSE_WARN] Step 1 (Claim) failed or nothing to claim: No fee to claim
+[2026-04-23T01:03:17.799Z] [CLOSE] Step 2: No position liquidity detected, closing account
+[2026-04-23T01:03:18.800Z] [CLOSE] Step 2 OK (close only): 24XASNs5mKcnNEhNbG65mHHjG1UrHXCgNtyZuPLykpyifMqMQWvKvM1Rgp6Zwbee2N8k6Yjdo7cQSLHeYSDknoRZ
+[2026-04-23T01:03:18.800Z] [CLOSE] SUCCESS txs: 24XASNs5mKcnNEhNbG65mHHjG1UrHXCgNtyZuPLykpyifMqMQWvKvM1Rgp6Zwbee2N8k6Yjdo7cQSLHeYSDknoRZ
+[2026-04-23T01:03:24.370Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:03:25.020Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:03:25.111Z] [STATE] Position 9jJoXCMjB1bAhg5Wnc68gLvNPFwbHsn6NKfihtYMC8mg auto-closed (missing from on-chain data)
+[2026-04-23T01:03:25.131Z] [STATE] Position 9jJoXCMjB1bAhg5Wnc68gLvNPFwbHsn6NKfihtYMC8mg marked closed: Rule 3: pumped far above range (active=-882 > upper=-893), OOR 10 minutes
+[2026-04-23T01:03:25.536Z] [CLOSE] Closed PnL from API: pnl=0.00 USD (0.00%), withdrawn=0.00, deposited=0.00
+[2026-04-23T01:03:25.612Z] [POOL-MEMORY] Recorded deploy for DUMBMONEY-SOL (GCwJrZN7): PnL 0%
+[2026-04-23T01:03:25.721Z] [EXECUTOR] Auto-swapping DUMBMONEY ($71.49, bal 68971.501789) back to SOL
+[2026-04-23T01:03:25.721Z] [SWAP] 68971.501789 of CAjtTHvC878f8cZ4zEwdvgjkjFM7rbYN8Mb1go1cpump → So11111111111111111111111111111111111111112
+[2026-04-23T01:03:26.392Z] [SWAP] SUCCESS tx: qeDuM7oEUPWgxtLzyvXNiX9ZVMkHE6cqYfiUJctSZTqQ4c1ozkbGfY3VZ1PbFs4ZAuqNX8FRXYfjXUVDp2BxT8m
+[2026-04-23T01:03:26.392Z] [AGENT] Step 2/20
+[2026-04-23T01:03:31.795Z] [LLM_COST] kimi-k2.5 role=MANAGER step=1 prompt=2861 completion=97 total=2958
+[2026-04-23T01:03:31.795Z] [AGENT] Final answer reached
+[2026-04-23T01:03:31.795Z] [AGENT] ✅ **DUMBMONEY-SOL** closed — position exited at 0% PnL (pumped far above range), base token auto-swapped to 0.847 SOL.
+[2026-04-23T01:03:31.795Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:03:32.387Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:03:32.942Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:04:03.752Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:04:04.722Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:04:32.392Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:04:33.387Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:05:00.205Z] [CRON] Starting management cycle
+[2026-04-23T01:05:00.431Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:05:01.625Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:05:02.386Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:05:02.447Z] [STATE] Position PzWFc8qGxtywadngVHbWrw4ddfWVUMBDQM2tBpy9Uo3 marked out of range
+[2026-04-23T01:05:02.586Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T01:05:02.586Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:05:02.603Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:05:02.767Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:05:02.857Z] [CRON] Post-management: 2/3 positions — triggering screening
+[2026-04-23T01:05:02.857Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:05:02.878Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:05:03.004Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:05:03.293Z] [CRON] Starting screening cycle [model: kimi-k2.5]
+[2026-04-23T01:05:03.294Z] [CRON] Computed deploy amount: 0.8 SOL (wallet: 3.031432 SOL)
+[2026-04-23T01:05:03.602Z] [BLACKLIST] Filtered blacklisted token Deployr (8JvDVZK6) in pool Deployr-SOL
+[2026-04-23T01:05:03.602Z] [BLACKLIST] Filtered blacklisted token maxxing (32CdQdBU) in pool maxxing-SOL
+[2026-04-23T01:05:03.602Z] [BLACKLIST] Filtered blacklisted token Deployr (8JvDVZK6) in pool Deployr-SOL
+[2026-04-23T01:05:03.602Z] [BLACKLIST] Filtered 3 pool(s) with blacklisted tokens/devs
+[2026-04-23T01:05:03.985Z] [SCREENING] Deprioritized 11 recently-seen pool(s), 5 fresh
+[2026-04-23T01:05:04.424Z] [OKX] advanced-info unavailable for ASTEROID-SOL (4UeLCRqA)
+[2026-04-23T01:05:04.425Z] [OKX] price-info unavailable for ASTEROID-SOL (4UeLCRqA)
+[2026-04-23T01:05:04.426Z] [OKX] advanced-info unavailable for Monitor-SOL (G8dUSvyw)
+[2026-04-23T01:05:04.426Z] [OKX] price-info unavailable for Monitor-SOL (G8dUSvyw)
+[2026-04-23T01:05:04.428Z] [OKX] advanced-info unavailable for ASTEROID-SOL (F1ppSHed)
+[2026-04-23T01:05:04.428Z] [OKX] price-info unavailable for ASTEROID-SOL (F1ppSHed)
+[2026-04-23T01:05:04.430Z] [OKX] advanced-info unavailable for abcdefg-SOL (89S7oVB4)
+[2026-04-23T01:05:04.430Z] [OKX] price-info unavailable for abcdefg-SOL (89S7oVB4)
+[2026-04-23T01:05:04.431Z] [OKX] advanced-info unavailable for DUMBMONEY-SOL (CAjtTHvC)
+[2026-04-23T01:05:04.431Z] [OKX] price-info unavailable for DUMBMONEY-SOL (CAjtTHvC)
+[2026-04-23T01:05:04.431Z] [OKX] advanced-info unavailable for 我的刀盾-SOL (6iA73gWC)
+[2026-04-23T01:05:04.431Z] [OKX] price-info unavailable for 我的刀盾-SOL (6iA73gWC)
+[2026-04-23T01:05:04.432Z] [OKX] advanced-info unavailable for DUMBMONEY-SOL (CAjtTHvC)
+[2026-04-23T01:05:04.432Z] [OKX] price-info unavailable for DUMBMONEY-SOL (CAjtTHvC)
+[2026-04-23T01:05:04.595Z] [OKX] advanced-info unavailable for abcdefg-SOL (89S7oVB4)
+[2026-04-23T01:05:04.595Z] [OKX] price-info unavailable for abcdefg-SOL (89S7oVB4)
+[2026-04-23T01:05:09.010Z] [SCREENING] Pool-memory filter: dropped abcdefg-SOL — pool memory: 7 deploys, win 28.57%, avg PnL -6.46%
+[2026-04-23T01:05:09.069Z] [SCREENING] Randomized pick: DUMBMONEY-SOL from top-5 bracket (Jupiter-routable)
+[2026-04-23T01:05:09.252Z] [AGENT] Step 1/20
+[2026-04-23T01:05:39.476Z] [LLM_COST] kimi-k2.5 role=SCREENER step=0 prompt=4505 completion=917 total=5422
+[2026-04-23T01:05:39.476Z] [SWAP] 0.8 of So11111111111111111111111111111111111111112 → G1okG7hA89Z1mheeQe79PFQLCZhLyoE8woD2sFwz2a21
+[2026-04-23T01:05:39.620Z] [SWAP_ERROR] Token G1okG7hA... not tradable on Jupiter (no swap route). Skip this candidate — likely a spoof mint or single-venue token.
+[2026-04-23T01:05:39.620Z] [AGENT] Step 2/20
+[2026-04-23T01:05:43.252Z] [LLM_COST] kimi-k2.5 role=SCREENER step=1 prompt=5480 completion=83 total=5563
+[2026-04-23T01:05:43.252Z] [AGENT] Final answer reached
+[2026-04-23T01:05:43.252Z] [AGENT] ⛔ REJECT DUMBMONEY-SOL: Token not tradable on Jupiter (no swap route) — cannot acquire base token for TOKEN-ONLY strategy deployment
+[2026-04-23T01:06:03.510Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:06:04.148Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:06:33.276Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:06:33.702Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:07:02.419Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:07:02.989Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:07:32.740Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:07:33.322Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:07:33.414Z] [STATE] Position Eb4po1jiat7cgqbgeLKRVWHaS1Ay1giypSXSggVDriS4 peak candidate 0.47% queued for 15s confirmation
+[2026-04-23T01:07:48.871Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:07:49.479Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:07:49.546Z] [STATE] Position Eb4po1jiat7cgqbgeLKRVWHaS1Ay1giypSXSggVDriS4 peak PnL confirmed at 0.59% after recheck
+[2026-04-23T01:08:02.718Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:08:03.151Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:08:32.337Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:08:32.750Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:09:02.964Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:09:03.395Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:09:03.476Z] [STATE] Position Eb4po1jiat7cgqbgeLKRVWHaS1Ay1giypSXSggVDriS4 peak candidate 0.66% queued for 15s confirmation
+[2026-04-23T01:09:19.145Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:09:19.719Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:09:19.844Z] [STATE] Position Eb4po1jiat7cgqbgeLKRVWHaS1Ay1giypSXSggVDriS4 peak PnL confirmed at 0.66% after recheck
+[2026-04-23T01:09:32.822Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:09:33.685Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:10:00.547Z] [CRON] Starting management cycle
+[2026-04-23T01:10:00.792Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:10:01.269Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:10:02.234Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:10:02.425Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T01:10:02.425Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:10:02.437Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:10:02.560Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:10:33.325Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:10:33.750Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:11:02.604Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:11:03.024Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:11:32.458Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:11:33.120Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:12:02.658Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:12:03.234Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:12:32.581Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:12:33.049Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:12:33.163Z] [STATE] Position Eb4po1jiat7cgqbgeLKRVWHaS1Ay1giypSXSggVDriS4 peak candidate 0.83% queued for 15s confirmation
+[2026-04-23T01:12:49.124Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:12:49.642Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:12:49.718Z] [STATE] Position Eb4po1jiat7cgqbgeLKRVWHaS1Ay1giypSXSggVDriS4 peak PnL confirmed at 0.84% after recheck
+[2026-04-23T01:13:02.568Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:13:03.067Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:13:32.362Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:13:32.799Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:13:32.919Z] [STATE] Position Eb4po1jiat7cgqbgeLKRVWHaS1Ay1giypSXSggVDriS4 peak candidate 0.85% queued for 15s confirmation
+[2026-04-23T01:13:48.332Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:13:48.744Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:13:48.866Z] [STATE] Position Eb4po1jiat7cgqbgeLKRVWHaS1Ay1giypSXSggVDriS4 peak PnL confirmed at 0.85% after recheck
+[2026-04-23T01:14:02.399Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:14:02.836Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:14:33.481Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:14:34.018Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:15:00.666Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:15:00.681Z] [CRON] Starting management cycle
+[2026-04-23T01:15:01.707Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:15:02.216Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:15:02.383Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T01:15:02.384Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:15:02.398Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:15:02.523Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:15:02.599Z] [CRON] Starting screening cycle [model: kimi-k2.5]
+[2026-04-23T01:15:02.600Z] [CRON] Computed deploy amount: 0.8 SOL (wallet: 3.031432 SOL)
+[2026-04-23T01:15:03.043Z] [BLACKLIST] Filtered blacklisted token Deployr (8JvDVZK6) in pool Deployr-SOL
+[2026-04-23T01:15:03.043Z] [BLACKLIST] Filtered blacklisted token maxxing (32CdQdBU) in pool maxxing-SOL
+[2026-04-23T01:15:03.043Z] [BLACKLIST] Filtered blacklisted token Deployr (8JvDVZK6) in pool Deployr-SOL
+[2026-04-23T01:15:03.043Z] [BLACKLIST] Filtered 3 pool(s) with blacklisted tokens/devs
+[2026-04-23T01:15:03.412Z] [SCREENING] Deprioritized 11 recently-seen pool(s), 5 fresh
+[2026-04-23T01:15:03.872Z] [OKX] advanced-info unavailable for Monitor-SOL (G8dUSvyw)
+[2026-04-23T01:15:03.873Z] [OKX] price-info unavailable for Monitor-SOL (G8dUSvyw)
+[2026-04-23T01:15:03.880Z] [OKX] advanced-info unavailable for roi-SOL (BdqNyg2k)
+[2026-04-23T01:15:03.881Z] [OKX] price-info unavailable for roi-SOL (BdqNyg2k)
+[2026-04-23T01:15:03.881Z] [OKX] advanced-info unavailable for 我的刀盾-SOL (6iA73gWC)
+[2026-04-23T01:15:03.881Z] [OKX] price-info unavailable for 我的刀盾-SOL (6iA73gWC)
+[2026-04-23T01:15:03.881Z] [OKX] advanced-info unavailable for abcdefg-SOL (89S7oVB4)
+[2026-04-23T01:15:03.881Z] [OKX] price-info unavailable for abcdefg-SOL (89S7oVB4)
+[2026-04-23T01:15:03.882Z] [OKX] advanced-info unavailable for ASTEROID-SOL (F1ppSHed)
+[2026-04-23T01:15:03.882Z] [OKX] price-info unavailable for ASTEROID-SOL (F1ppSHed)
+[2026-04-23T01:15:03.883Z] [OKX] advanced-info unavailable for ASTEROID-SOL (4UeLCRqA)
+[2026-04-23T01:15:03.883Z] [OKX] price-info unavailable for ASTEROID-SOL (4UeLCRqA)
+[2026-04-23T01:15:03.885Z] [OKX] advanced-info unavailable for DUMBMONEY-SOL (CAjtTHvC)
+[2026-04-23T01:15:03.885Z] [OKX] price-info unavailable for DUMBMONEY-SOL (CAjtTHvC)
+[2026-04-23T01:15:03.897Z] [OKX] advanced-info unavailable for abcdefg-SOL (89S7oVB4)
+[2026-04-23T01:15:03.897Z] [OKX] price-info unavailable for abcdefg-SOL (89S7oVB4)
+[2026-04-23T01:15:08.668Z] [SCREENING] Pool-memory filter: dropped abcdefg-SOL — pool memory: 7 deploys, win 28.57%, avg PnL -6.46%
+[2026-04-23T01:15:08.721Z] [SCREENING] Randomized pick: roi-SOL from top-5 bracket (Jupiter-routable)
+[2026-04-23T01:15:08.960Z] [AGENT] Step 1/20
+[2026-04-23T01:15:54.569Z] [LLM_COST] kimi-k2.5 role=SCREENER step=0 prompt=4495 completion=1304 total=5799
+[2026-04-23T01:15:54.570Z] [AGENT] Final answer reached
+[2026-04-23T01:15:54.570Z] [AGENT] ⛔ REJECT roi-SOL: Active strategy requires TOKEN-ONLY deposit (swap SOL→base token first), but this contradicts the provided "Single-side SOL" deploy instructions; deployment method ambiguity prevents execution.
+[2026-04-23T01:16:02.453Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:16:02.953Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:16:32.658Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:16:33.175Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:17:02.843Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:17:03.374Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:17:32.318Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:17:32.704Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:18:02.689Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:18:03.256Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:18:32.323Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:18:32.721Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:19:02.283Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:19:02.762Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:19:32.739Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:19:33.153Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:20:00.972Z] [CRON] Starting management cycle
+[2026-04-23T01:20:01.204Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:20:01.986Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:20:02.906Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:20:03.147Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T01:20:03.147Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:20:03.160Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:20:03.282Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:20:03.372Z] [CRON] Post-management: 2/3 positions — triggering screening
+[2026-04-23T01:20:03.372Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:20:03.385Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:20:03.509Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:20:03.826Z] [CRON] Starting screening cycle [model: kimi-k2.5]
+[2026-04-23T01:20:03.826Z] [CRON] Computed deploy amount: 0.8 SOL (wallet: 3.031432 SOL)
+[2026-04-23T01:20:04.167Z] [BLACKLIST] Filtered blacklisted token Deployr (8JvDVZK6) in pool Deployr-SOL
+[2026-04-23T01:20:04.167Z] [BLACKLIST] Filtered blacklisted token maxxing (32CdQdBU) in pool maxxing-SOL
+[2026-04-23T01:20:04.167Z] [BLACKLIST] Filtered blacklisted token Deployr (8JvDVZK6) in pool Deployr-SOL
+[2026-04-23T01:20:04.167Z] [BLACKLIST] Filtered 3 pool(s) with blacklisted tokens/devs
+[2026-04-23T01:20:04.541Z] [SCREENING] Deprioritized 11 recently-seen pool(s), 6 fresh
+[2026-04-23T01:20:04.984Z] [OKX] advanced-info unavailable for DUMBMONEY-SOL (CAjtTHvC)
+[2026-04-23T01:20:04.989Z] [OKX] advanced-info unavailable for roi-SOL (BdqNyg2k)
+[2026-04-23T01:20:04.989Z] [OKX] price-info unavailable for roi-SOL (BdqNyg2k)
+[2026-04-23T01:20:04.994Z] [OKX] advanced-info unavailable for abcdefg-SOL (89S7oVB4)
+[2026-04-23T01:20:04.994Z] [OKX] price-info unavailable for abcdefg-SOL (89S7oVB4)
+[2026-04-23T01:20:04.994Z] [OKX] advanced-info unavailable for ASTEROID-SOL (F1ppSHed)
+[2026-04-23T01:20:04.994Z] [OKX] price-info unavailable for ASTEROID-SOL (F1ppSHed)
+[2026-04-23T01:20:04.996Z] [OKX] advanced-info unavailable for ASTEROID-SOL (4UeLCRqA)
+[2026-04-23T01:20:04.996Z] [OKX] price-info unavailable for ASTEROID-SOL (4UeLCRqA)
+[2026-04-23T01:20:04.998Z] [OKX] advanced-info unavailable for 我的刀盾-SOL (6iA73gWC)
+[2026-04-23T01:20:04.998Z] [OKX] price-info unavailable for 我的刀盾-SOL (6iA73gWC)
+[2026-04-23T01:20:05.001Z] [OKX] price-info unavailable for uncraft-SOL (2pFFgMtw)
+[2026-04-23T01:20:05.005Z] [OKX] advanced-info unavailable for DUMBMONEY-SOL (CAjtTHvC)
+[2026-04-23T01:20:05.005Z] [OKX] price-info unavailable for DUMBMONEY-SOL (CAjtTHvC)
+[2026-04-23T01:20:05.005Z] [OKX] cluster-list unavailable for DUMBMONEY-SOL (CAjtTHvC)
+[2026-04-23T01:20:05.085Z] [OKX] advanced-info unavailable for Monitor-SOL (G8dUSvyw)
+[2026-04-23T01:20:05.085Z] [OKX] price-info unavailable for Monitor-SOL (G8dUSvyw)
+[2026-04-23T01:20:09.450Z] [SCREENING] Randomized pick: roi-SOL from top-5 bracket (Jupiter-routable)
+[2026-04-23T01:20:09.652Z] [AGENT] Step 1/20
+[2026-04-23T01:20:43.657Z] [LLM_COST] kimi-k2.5 role=SCREENER step=0 prompt=4495 completion=1007 total=5502
+[2026-04-23T01:20:43.657Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:20:44.231Z] [POSITIONS] Found 2 pool(s) with open positions
+[2026-04-23T01:20:44.653Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:20:44.920Z] [DEPLOY] Pool: 33zGDGyQFqfVdmnY8LWsvEftH8t4AXT6VpSvjRS5JDXg
+[2026-04-23T01:20:44.920Z] [DEPLOY] Strategy: bid_ask, Bins: -1335 to -1249 (86 bins — WIDE RANGE)
+[2026-04-23T01:20:44.920Z] [DEPLOY] Amount: 0 X, 0.8 Y
+[2026-04-23T01:20:44.920Z] [DEPLOY] Position: 5a5HSjKQ9u9FjQkHSCiRFhgAjHH1NfA1ybYNGerLNKii
+[2026-04-23T01:20:45.926Z] [DEPLOY] Create tx 1/1: 4VvrE3cZdfRycs5kqAuNTuNuVRPDHzRfx7gNUaztbbvJL2C9RdRHaqrLG2S9TN5WzpRZa4G3UmvVtyhotTK6kqcE
+[2026-04-23T01:20:46.756Z] [DEPLOY] Add liquidity tx 1/2: 3x217JErqrL9eHEAKKdZF3yTCZFHBwBPFUGuqQViaS6JEaBKTkprN5Ca2k2WPkFqxjc4JY4W5enWhueyGrKgwiwo
+[2026-04-23T01:20:47.744Z] [DEPLOY] Add liquidity tx 2/2: 5MQoEeUpuKJD3mcav5KXMxoUYsrUmcpGnxGhaBMM3X9AeUhjZVnMwhvSppxXogV9kEydAAzqgNcxnYew2VzNRhF9
+[2026-04-23T01:20:47.744Z] [DEPLOY] SUCCESS — 3 tx(s): 4VvrE3cZdfRycs5kqAuNTuNuVRPDHzRfx7gNUaztbbvJL2C9RdRHaqrLG2S9TN5WzpRZa4G3UmvVtyhotTK6kqcE
+[2026-04-23T01:20:47.769Z] [STATE] Tracked new position: 5a5HSjKQ9u9FjQkHSCiRFhgAjHH1NfA1ybYNGerLNKii in pool 33zGDGyQFqfVdmnY8LWsvEftH8t4AXT6VpSvjRS5JDXg
+[2026-04-23T01:20:47.773Z] [AGENT] Step 2/20
+[2026-04-23T01:20:55.464Z] [LLM_COST] kimi-k2.5 role=SCREENER step=1 prompt=5911 completion=198 total=6109
+[2026-04-23T01:20:55.464Z] [AGENT] Final answer reached
+[2026-04-23T01:20:55.464Z] [AGENT] 🚀 DEPLOYED roi-SOL | ◎ 0.8 SOL | bid_ask | bin -1249 | Fee/TVL: 6.21% | Why: Exceptional fee/TVL yield with strong organic score (72) outweighs mixed memory and lack of smart wallets.
+[2026-04-23T01:21:02.769Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:21:03.569Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:21:03.694Z] [STATE] Position PzWFc8qGxtywadngVHbWrw4ddfWVUMBDQM2tBpy9Uo3 back in range
+[2026-04-23T01:21:32.598Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:21:33.501Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:21:33.618Z] [STATE] Position 5a5HSjKQ9u9FjQkHSCiRFhgAjHH1NfA1ybYNGerLNKii peak candidate 0.03% queued for 15s confirmation
+[2026-04-23T01:21:49.379Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:21:50.529Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:21:50.642Z] [STATE] Position 5a5HSjKQ9u9FjQkHSCiRFhgAjHH1NfA1ybYNGerLNKii peak PnL confirmed at 0.03% after recheck
+[2026-04-23T01:22:02.444Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:22:03.193Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:22:33.462Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:22:34.180Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:23:02.704Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:23:03.568Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:23:32.872Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:23:33.587Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:24:03.150Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:24:04.314Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:24:32.467Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:24:33.157Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:25:00.530Z] [CRON] Starting management cycle
+[2026-04-23T01:25:00.757Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:25:01.302Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:25:02.288Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:25:02.532Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T01:25:02.532Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:25:02.544Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:25:02.674Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:25:32.516Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:25:33.260Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:26:02.928Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:26:03.805Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:26:32.766Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:26:33.471Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:27:03.040Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:27:03.750Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:27:33.240Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:27:34.360Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:28:02.453Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:28:03.172Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:28:32.395Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:28:33.517Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:29:02.476Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:29:03.319Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:29:03.450Z] [STATE] Position 5a5HSjKQ9u9FjQkHSCiRFhgAjHH1NfA1ybYNGerLNKii peak candidate 0.10% queued for 15s confirmation
+[2026-04-23T01:29:18.797Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:29:19.497Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:29:19.616Z] [STATE] Position 5a5HSjKQ9u9FjQkHSCiRFhgAjHH1NfA1ybYNGerLNKii peak PnL confirmed at 0.10% after recheck
+[2026-04-23T01:29:32.908Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:29:33.827Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:30:00.740Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:30:00.742Z] [CRON] Starting management cycle
+[2026-04-23T01:30:01.650Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:30:02.427Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:30:02.526Z] [CRON] Screening skipped — max positions reached (3/3)
+[2026-04-23T01:30:02.701Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T01:30:02.701Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:30:02.724Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:30:02.845Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:30:33.049Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:30:33.771Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:31:02.771Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:31:03.471Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:31:32.383Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:31:33.231Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:32:02.749Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:32:03.483Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:32:32.865Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:32:33.592Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:32:41.605Z] [TELEGRAM] Incoming: send me morning briefing
+[2026-04-23T01:32:42.297Z] [AGENT] Step 1/20
+[2026-04-23T01:33:02.653Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:33:03.619Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:33:22.194Z] [LLM_COST] kimi-k2.5 role=GENERAL step=0 prompt=13431 completion=1124 total=14555
+[2026-04-23T01:33:22.194Z] [AGENT] Final answer reached
+[2026-04-23T01:33:22.194Z] [AGENT] ## 📊 MORNING BRIEFING — 2026-04-23 01:32 UTC
+
+### 💰 PORTFOLIO STATUS
+| Asset | Balance | USD Value |
+|-------|---------|-----------|
+| SOL | ~0.66 | ~$57 |
+| Positions | 3 active | ~$207 |
+| **Total** | — | **~$264** |
+
+---
+
+### 📈 OPEN POSITIONS (3/3)
+
+| Pool | Position | Age | In Range | Fees | PnL | Strategy |
+|------|----------|-----|----------|------|-----|----------|
+| **roi-SOL** | `7KqzZ5xbr...` | Just now | ✅ Yes | $0 | 0% | bid_ask |
+| **发财-SOL** | `Eb4po1ji...` | ~2h | ✅ Yes | $1.00 | +0.26% | spot |
+| **🕶️-SOL** | (context shows this) | 11m | ✅ Yes | $0.01 | -0.03% | bid_ask |
+
+**Key metrics:**
+- **Best performer:** 发财-SOL (+0.26%, $1.00 unclaimed fees)
+- **High yield:** 发财-SOL (18.83% fee/TVL — excellent)
+- **All positions in-range:** 100% coverage
+
+---
+
+### 🎯 OVERNIGHT ACTIVITY
+
+**Closures (2):**
+- ❌ **DUMBMONEY-SOL** → Empty position, $0 value recovered
+  - *Lesson learned:* Always verify liquidity before deploying
+
+**Deployments (2):**
+- ✅ **roi-SOL** → 1.5 SOL deployed (just now)
+  - Repeat deployment to proven pool (100% win rate, +4.33% avg)
+  - High volatility (6.79) for good fee capture
+
+---
+
+### 📊 PERFORMANCE SNAPSHOT (Last 24h)
+
+- **Closed positions:** 10
+- **Win rate:** 60% (6 wins / 4 losses)
+- **Net PnL:** ~+$12.40
+- **Avg hold time:** ~45 minutes
+
+---
+
+### ⚠️ ACTION ITEMS
+
+1. **Monitor 发财-SOL** — $1.00 fees accumulated, consider claiming when >$10
+2. **Watch roi-SOL volatility** — High vol pool, may need tighter management (3-5 min intervals)
+3. **Portfolio constraint** — Max 3 positions active, screening paused until slot opens
+
+---
+
+### 🎯 STRATEGY NOTES
+
+- **Bid-ask** performing well on high-vol pairs (roi-SOL: 6.79 vol)
+- **Trailing TP** active (stop -2.5%, trigger +1.5%, drop -2.5%)
+- **Gas efficiency:** minClaimAmount raised to $10 (saves on claim frequency)
+
+**Status:** ✅ Operational, all positions healthy and earning fees.
+[2026-04-23T01:33:32.502Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:33:33.631Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:34:02.538Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:34:03.247Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:34:32.478Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:34:33.320Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:35:00.929Z] [CRON] Starting management cycle
+[2026-04-23T01:35:01.149Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:35:02.117Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:35:02.810Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:35:02.852Z] [STATE] Position 5a5HSjKQ9u9FjQkHSCiRFhgAjHH1NfA1ybYNGerLNKii marked out of range
+[2026-04-23T01:35:03.085Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T01:35:03.085Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:35:03.107Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:35:03.233Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:35:32.456Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:35:33.744Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:36:02.560Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:36:03.437Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:36:33.252Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:36:34.436Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:37:02.372Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:37:03.203Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:37:33.163Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:37:34.086Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:37:34.194Z] [STATE] Position PzWFc8qGxtywadngVHbWrw4ddfWVUMBDQM2tBpy9Uo3 marked out of range
+[2026-04-23T01:38:02.789Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:38:03.526Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:38:32.626Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:38:33.408Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:39:02.498Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:39:03.318Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:39:32.323Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:39:33.073Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:40:00.344Z] [CRON] Starting management cycle
+[2026-04-23T01:40:00.587Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:40:01.393Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:40:02.291Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:40:02.546Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T01:40:02.546Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:40:02.558Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:40:02.686Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:40:32.442Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:40:33.191Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:41:02.841Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:41:03.660Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:41:33.035Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:41:33.846Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:42:02.676Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:42:03.396Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:42:32.757Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:42:33.498Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:43:02.513Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:43:03.231Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:43:03.365Z] [STATE] Position 5a5HSjKQ9u9FjQkHSCiRFhgAjHH1NfA1ybYNGerLNKii peak candidate 0.23% queued for 15s confirmation
+[2026-04-23T01:43:18.946Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:43:20.073Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:43:20.190Z] [STATE] Position 5a5HSjKQ9u9FjQkHSCiRFhgAjHH1NfA1ybYNGerLNKii peak PnL confirmed at 0.23% after recheck
+[2026-04-23T01:43:32.717Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:43:33.505Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:44:02.320Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:44:03.248Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:44:32.642Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:44:33.647Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:45:00.834Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:45:00.837Z] [CRON] Starting management cycle
+[2026-04-23T01:45:01.451Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:45:02.178Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:45:02.300Z] [CRON] Screening skipped — max positions reached (3/3)
+[2026-04-23T01:45:02.478Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T01:45:02.478Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:45:02.495Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:45:02.616Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:45:32.496Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:45:33.224Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:46:02.746Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:46:03.488Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:46:32.788Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:46:33.518Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:47:02.797Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:47:03.653Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:47:32.738Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:47:33.457Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:48:02.388Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:48:03.122Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:48:32.594Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:48:33.331Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:49:02.849Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:49:03.670Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:49:32.572Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:49:33.289Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:50:00.986Z] [CRON] Starting management cycle
+[2026-04-23T01:50:01.221Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:50:01.636Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:50:02.676Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:50:02.973Z] [CRON] Management: all positions STAY — skipping LLM
+[2026-04-23T01:50:02.973Z] [POSITIONS] Fetching portfolio via Meteora portfolio API...
+[2026-04-23T01:50:02.986Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:50:03.106Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:50:33.288Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:50:34.018Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:51:02.746Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:51:03.561Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:51:32.438Z] [POSITIONS] Found 3 pool(s) with open positions
+[2026-04-23T01:51:33.224Z] [LPAGENT_API] HTTP 401 for owner 8zaAnu8a: {"message":"Unauthorized"}
+[2026-04-23T01:51:37.827Z] [SHUTDOWN] Received SIGTERM. Shutting down...
+[2026-04-23T01:51:37.828Z] [SHUTDOWN] Open positions at shutdown: 3

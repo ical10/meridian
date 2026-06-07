@@ -85,6 +85,13 @@ export const config = {
     source:            u.screeningSource    ?? "meteora", // meteora | gmgn
     excludeHighSupplyConcentration: u.excludeHighSupplyConcentration ?? true,
     minFeeActiveTvlRatio: u.minFeeActiveTvlRatio ?? 0.05,
+    maxFeeActiveTvlRatio: u.maxFeeActiveTvlRatio ?? null, // null = no cap; opt-in
+    // Opt-in multi-band fee/TVL filter. When set (non-empty array), overrides
+    // min/max for the in-band check. Each band is [low, high] with null high = open.
+    // Example: [[0.5, 1.0], [3.0, null]] = "in [0.5, 1.0] OR in [3.0, ∞)".
+    // API-level coarse filter uses overall min/max of bands (high=null → no API cap).
+    feeActiveTvlBands:    Array.isArray(u.feeActiveTvlBands) ? u.feeActiveTvlBands : null,
+    minVolatility:        u.minVolatility        ?? null, // null = no floor; opt-in. data shows ≥5 cuts the loss-cluster band
     minTvl:            u.minTvl            ?? 10_000,
     maxTvl:            u.maxTvl !== undefined ? u.maxTvl : 150_000,
     minVolume:         u.minVolume         ?? 500,
@@ -206,6 +213,12 @@ export const config = {
     takeProfitPct:         u.takeProfitPct         ?? u.takeProfitFeePct ?? 5,
     minFeePerTvl24h:       u.minFeePerTvl24h       ?? 7,
     minAgeBeforeYieldCheck: u.minAgeBeforeYieldCheck ?? 60, // minutes before low yield can trigger close
+    // Dead-pool exit: close a position that's sat idle without meaningful PnL movement.
+    // Catches deploys into pools that aren't actively trading — peak never moves above
+    // deadPoolMaxPeakPct within deadPoolMinAgeMinutes. Cuts gas + slippage waste on the
+    // ~25% of historical closes that match this pattern (peak <1% within 20m).
+    deadPoolMinAgeMinutes: u.deadPoolMinAgeMinutes ?? null, // null = disabled. opt-in. cuts ~25% of historical idle closes when set (e.g., 10)
+    deadPoolMaxPeakPct:    u.deadPoolMaxPeakPct    ?? null, // null = disabled. opt-in. e.g., 0.3 = close if peak < 0.3% within deadPoolMinAgeMinutes
     minSolToOpen:          u.minSolToOpen          ?? 0.55,
     deployAmountSol:       u.deployAmountSol       ?? 0.5,
     gasReserve:            u.gasReserve            ?? 0.2,
@@ -238,7 +251,9 @@ export const config = {
   llm: {
     temperature: u.temperature ?? 0.373,
     maxTokens:   u.maxTokens   ?? 4096,
-    maxSteps:    u.maxSteps    ?? 20,
+    maxSteps:           u.maxSteps           ?? 20,
+    maxStepsScreener:   u.maxStepsScreener   ?? 8,
+    maxStepsManager:    u.maxStepsManager    ?? 10,
     managementModel: u.managementModel ?? process.env.LLM_MODEL ?? "openrouter/healer-alpha",
     screeningModel:  u.screeningModel  ?? process.env.LLM_MODEL ?? "openrouter/hunter-alpha",
     generalModel:    u.generalModel    ?? process.env.LLM_MODEL ?? "openrouter/healer-alpha",
@@ -344,6 +359,9 @@ export function reloadScreeningThresholds() {
     const s = config.screening;
     if (fresh.screeningSource != null) s.source = fresh.screeningSource;
     if (fresh.minFeeActiveTvlRatio != null) s.minFeeActiveTvlRatio = fresh.minFeeActiveTvlRatio;
+    if (fresh.maxFeeActiveTvlRatio !== undefined) s.maxFeeActiveTvlRatio = fresh.maxFeeActiveTvlRatio;
+    if (fresh.feeActiveTvlBands !== undefined) s.feeActiveTvlBands = Array.isArray(fresh.feeActiveTvlBands) ? fresh.feeActiveTvlBands : null;
+    if (fresh.minVolatility !== undefined) s.minVolatility = fresh.minVolatility;
     if (fresh.minTokenFeesSol  != null) s.minTokenFeesSol  = fresh.minTokenFeesSol;
     if (fresh.maxTop10Pct      != null) s.maxTop10Pct      = fresh.maxTop10Pct;
     if (fresh.useDiscordSignals !== undefined) s.useDiscordSignals = fresh.useDiscordSignals;

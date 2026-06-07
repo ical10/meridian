@@ -471,8 +471,27 @@ export function updatePnlAndCheckExits(position_address, positionData, mgmtConfi
     }
   }
 
-  // ── Low yield (only after position has had time to accumulate fees) ───
   const { age_minutes } = positionData;
+
+  // ── Dead pool: position sat idle without meaningful PnL movement ──────
+  // Fires before LOW_YIELD's 60m gate to catch dead-pool deploys early. Peak is
+  // the all-time peak observed by the relay poller — if it never crossed the
+  // threshold within the first deadPoolMinAgeMinutes minutes, the pool isn't
+  // trading and we should exit instead of waiting for the slower yield check.
+  if (
+    mgmtConfig.deadPoolMinAgeMinutes != null &&
+    mgmtConfig.deadPoolMaxPeakPct != null &&
+    age_minutes != null &&
+    age_minutes >= mgmtConfig.deadPoolMinAgeMinutes &&
+    (pos.peak_pnl_pct ?? 0) < mgmtConfig.deadPoolMaxPeakPct
+  ) {
+    return {
+      action: "DEAD_POOL",
+      reason: `Dead pool: peak ${(pos.peak_pnl_pct ?? 0).toFixed(2)}% < ${mgmtConfig.deadPoolMaxPeakPct}% after ${age_minutes}m`,
+    };
+  }
+
+  // ── Low yield (only after position has had time to accumulate fees) ───
   const minAgeForYieldCheck = mgmtConfig.minAgeBeforeYieldCheck ?? 60;
   if (
     fee_per_tvl_24h != null &&
