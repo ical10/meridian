@@ -62,7 +62,7 @@ function unique(arr) {
 export async function fetchDlmmPnlForPool(poolAddress, walletAddress) {
   const url = `${METEORA_PNL}/${poolAddress}/pnl?user=${walletAddress}&status=open&pageSize=100&page=1`;
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
     if (!res.ok) {
       const body = await res.text().catch(() => "");
       log("pnl_api", `HTTP ${res.status} for pool ${poolAddress.slice(0, 8)}: ${body.slice(0, 120)}`);
@@ -87,7 +87,7 @@ async function getJupiterPrices(mints) {
   const list = unique(mints.map((m) => String(m).trim()));
   if (!list.length) return {};
   try {
-    const res = await fetch(`${JUP_SEARCH}?query=${list.join(",")}`, { headers: { accept: "application/json" } });
+    const res = await fetch(`${JUP_SEARCH}?query=${list.join(",")}`, { headers: { accept: "application/json" }, signal: AbortSignal.timeout(10_000) });
     if (!res.ok) throw new Error(`Jupiter ${res.status}`);
     const assets = await res.json();
     const out = {};
