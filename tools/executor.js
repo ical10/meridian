@@ -1,5 +1,4 @@
 import { discoverPools, getPoolDetail, getTopCandidates } from "./screening.js";
-import { checkDeployGuard, setDeployGuard } from "../index.js";
 import {
   getActiveBin,
   deployPosition,
@@ -25,16 +24,18 @@ import { config, reloadScreeningThresholds, MIN_SAFE_BINS_BELOW } from "../confi
 import { CONFIG_MAP } from "../config-map.js";
 import { getRecentDecisions } from "../decision-log.js";
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import { execSync, spawn } from "child_process";
-import { REPO_ROOT, repoPath } from "../repo-root.js";
-import { normalizeTimeframe, scaleScreeningToTimeframe } from "../screening-scales.js";
 
-const USER_CONFIG_PATH = repoPath("user-config.json");
-const GMGN_CONFIG_PATH = repoPath("gmgn-config.json");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const USER_CONFIG_PATH = path.join(__dirname, "../user-config.json");
+const GMGN_CONFIG_PATH = path.join(__dirname, "../gmgn-config.json");
 const POOL_DISCOVERY_BASE = "https://pool-discovery-api.datapi.meteora.ag";
 const MIN_VOLATILITY_TIMEFRAME = "30m";
 const TIMEFRAME_MINUTES = {
   "5m": 5,
+  "15m": 15,
   "30m": 30,
   "1h": 60,
   "2h": 120,
@@ -184,15 +185,7 @@ async function validateDeployPoolThresholds(args) {
     };
   }
 
-  const baseMint = detail?.token_x?.address || detail?.base_token_address || null;
-  const entryMarketData = {
-    entry_mcap: numberOrNull(detail?.token_x?.market_cap ?? detail?.base_token_market_cap),
-    entry_tvl: tvl,
-    entry_volume: numberOrNull(detail?.volume),
-    entry_holders: numberOrNull(detail?.base_token_holders ?? detail?.token_x?.holders),
-  };
-
-  return { pass: true, entryMarketData };
+  return { pass: true };
 }
 
 // Registered by index.js so update_config can restart cron jobs when intervals change
@@ -206,16 +199,7 @@ const toolMap = {
   get_pool_detail: getPoolDetail,
   get_position_pnl: getPositionPnl,
   get_active_bin: getActiveBin,
-  deploy_position: async (args) => {
-    if (checkDeployGuard()) {
-      return { blocked: true, reason: "Already deployed once in this screening cycle. Only one deploy per cycle allowed." };
-    }
-    const result = await deployPosition(args);
-    if (result?.success) {
-      setDeployGuard();
-    }
-    return result;
-  },
+  deploy_position: deployPosition,
   get_my_positions: getMyPositions,
   get_wallet_positions: getWalletPositions,
   search_pools: searchPools,
@@ -239,7 +223,7 @@ const toolMap = {
   },
   self_update: async () => {
     try {
-      const result = execSync("git pull", { cwd: REPO_ROOT, encoding: "utf8" }).trim();
+      const result = execSync("git pull", { cwd: process.cwd(), encoding: "utf8" }).trim();
       if (result.includes("Already up to date")) {
         return { success: true, updated: false, message: "Already up to date — no restart needed." };
       }
@@ -249,7 +233,7 @@ const toolMap = {
           const child = spawn(process.execPath, process.argv.slice(1), {
             detached: true,
             stdio: "inherit",
-            cwd: REPO_ROOT,
+            cwd: process.cwd(),
           });
           child.unref();
         }
@@ -335,31 +319,10 @@ const toolMap = {
       return { success: false, unknown, reason };
     }
 
-    let userConfig = {};
-    if (fs.existsSync(USER_CONFIG_PATH)) {
-      try {
-        userConfig = JSON.parse(fs.readFileSync(USER_CONFIG_PATH, "utf8"));
-      } catch (error) {
-        return { success: false, error: `Invalid user-config.json: ${error.message}`, reason };
-      }
-    }
-
-    // Auto-scale fee/volume when timeframe changes (unless user set them explicitly in same call).
-    if (applied.timeframe != null && applied.minFeeActiveTvlRatio == null && applied.minVolume == null) {
-      const tf = normalizeTimeframe(applied.timeframe);
-      applied.timeframe = tf;
-      const scaled = scaleScreeningToTimeframe(tf);
-      applied.minFeeActiveTvlRatio = scaled.minFeeActiveTvlRatio;
-      applied.minVolume = scaled.minVolume;
-      applied._timeframeScaled = true;
-      log("config", `timeframe ${tf} → auto-scaled minFeeActiveTvlRatio=${scaled.minFeeActiveTvlRatio}, minVolume=${scaled.minVolume}`);
-    }
-
     // Apply to live config immediately
     for (const [key, val] of Object.entries(applied)) {
-      if (key.startsWith("_")) continue;
       const [section, field, third] = CONFIG_MAP[key];
-      const isNestedField = typeof third === "string";
+      const isNestedField = typeof third === "string"; // string = nested subfield, array = persistPath
       if (isNestedField) {
         if (!config[section][field] || typeof config[section][field] !== "object") config[section][field] = {};
         const before = config[section][field][third];
@@ -389,6 +352,10 @@ const toolMap = {
     }
 
     // Persist GMGN tuning to gmgn-config.json, and everything else to user-config.json.
+    let userConfig = {};
+    if (fs.existsSync(USER_CONFIG_PATH)) {
+      try { userConfig = JSON.parse(fs.readFileSync(USER_CONFIG_PATH, "utf8")); } catch { /**/ }
+    }
     let gmgnConfig = {};
     if (fs.existsSync(GMGN_CONFIG_PATH)) {
       try { gmgnConfig = JSON.parse(fs.readFileSync(GMGN_CONFIG_PATH, "utf8")); } catch { /**/ }
@@ -396,7 +363,6 @@ const toolMap = {
     let wroteUserConfig = false;
     let wroteGmgnConfig = false;
     for (const [key, val] of Object.entries(applied)) {
-      if (key.startsWith("_")) continue;
       const [section, field, third] = CONFIG_MAP[key] || [];
       const persistPath = Array.isArray(third) ? third : null;
       const nestedField = typeof third === "string" ? third : null;
@@ -438,14 +404,14 @@ const toolMap = {
     const intervalChanged = applied.managementIntervalMin != null || applied.screeningIntervalMin != null || applied.pnlPollIntervalSec != null;
     if (intervalChanged && _cronRestarter) {
       _cronRestarter();
-      log("config", `Cron restarted — management: ${config.schedule.managementIntervalMin}m, screening: ${config.schedule.screeningIntervalMin}m`);
+      log("config", `Cron restarted — management: ${config.schedule.managementIntervalMin}m, screening: ${config.schedule.screeningIntervalMin}m, pnlPoll: ${config.pnl.pollIntervalSec}s`);
     }
 
     // Save as a lesson — but skip ephemeral per-deploy interval changes
     // (managementIntervalMin / screeningIntervalMin change every deploy based on volatility;
     //  the rule is already in the system prompt, storing it 75+ times is pure noise)
     const lessonsKeys = Object.keys(applied).filter(
-      k => !k.startsWith("_") && k !== "managementIntervalMin" && k !== "screeningIntervalMin"
+      k => k !== "managementIntervalMin" && k !== "screeningIntervalMin"
     );
     if (lessonsKeys.length > 0) {
       const summary = lessonsKeys.map(k => `${k}=${redactConfigValue(k, applied[k])}`).join(", ");
@@ -597,7 +563,6 @@ async function runSafetyChecks(name, args) {
     case "deploy_position": {
       const poolThresholds = await validateDeployPoolThresholds(args);
       if (!poolThresholds.pass) return poolThresholds;
-      if (poolThresholds.entryMarketData) Object.assign(args, poolThresholds.entryMarketData);
 
       // Reject pools with bin_step out of configured range
       const minStep = config.screening.minBinStep;

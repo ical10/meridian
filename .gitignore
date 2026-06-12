@@ -46,3 +46,7 @@ discord-signals.json
 
 # Claude Code runtime lock
 .claude/scheduled_tasks.lock
+
+# Local checkpoint logs and backup files
+checkpoints/
+*.bak-*

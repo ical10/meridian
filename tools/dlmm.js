@@ -1935,6 +1935,30 @@ export async function closePosition({ position_address, reason }) {
             base_mint: closeBaseMint,
           };
         }
+
+        appendDecision({
+          type: "close",
+          actor: "MANAGER",
+          pool: poolAddress,
+          pool_name: poolMeta.name || poolAddress.slice(0, 8),
+          position: position_address,
+          summary: "Relay closed position",
+          reason: reason || "agent decision",
+          metrics: {},
+        });
+
+        return {
+          success: true,
+          relay: true,
+          request_id: order.requestId,
+          position: position_address,
+          pool: poolAddress,
+          pool_name: poolMeta.name || null,
+          claim_txs: claimTxHashes,
+          close_txs: closeTxHashes,
+          txs: txHashes,
+          base_mint: livePosition?.base_mint || null,
+        };
       } catch (relayError) {
         if (relaySubmitted) throw relayError;
         log("close_warn", `Relay zap-out failed before submit; falling back to local close + Jupiter autoswap: ${relayError.message}`);

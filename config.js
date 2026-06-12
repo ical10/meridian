@@ -102,6 +102,7 @@ export const config = {
     minMcap:           u.minMcap           ?? 150_000,
     maxPriceChangePct: u.maxPriceChangePct ?? null, // null disables; X = skip pools whose price moved more than ±X% over the screening timeframe (catches post-pump knife-catches and free-falling pools)
     maxHourlyDumpPct:  u.maxHourlyDumpPct  ?? null, // null disables; X = skip pools dumping more than X% over 1h (catches falling-knife entries — MOGMAN had -25% 1h drop at deploy)
+    maxBundlePct:      u.maxBundlePct      ?? 30,  // max bundle holding % (OKX advanced-info)
     maxMcap:           u.maxMcap           ?? 10_000_000,
     minBinStep:        u.minBinStep        ?? 80,
     maxBinStep:        u.maxBinStep        ?? 125,

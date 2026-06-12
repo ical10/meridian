@@ -131,7 +131,7 @@ Only call this if you need the current price to calculate a specific bin range (
 
 PRIORITY ORDER for strategy and bins:
 1. User explicitly specifies → always follow exactly (user override is absolute)
-2. No user spec → use the configured strategy from config.strategy.strategy and choose bins based on volatility
+2. No user spec → use active strategy's lp_strategy and choose bins based on volatility
 
 HARD RULES:
 - Never use 'curve'.
@@ -141,9 +141,9 @@ HARD RULES:
   use bins_below only, keep bins_above=0, and the upper bin will be pinned to the current active bin.
 
 Guidelines (only when user hasn't specified):
-- Strategy: omit the strategy field — the system will use the configured default from config.strategy.strategy
-- Bins: choose from configured minBinsBelow/maxBinsBelow by positive volatility. The hard lower floor is 35 bins.
-- Deposit: single-sided SOL only: set amount_y/amount_sol, keep amount_x=0.
+- Strategy: use the active strategy's lp_strategy field (bid_ask or spot)
+- Bins: choose 35–69 for standard volatility; up to 350 for wide-range strategies. Max 1400 total.
+- Deposit: single-sided SOL only. Use amount_y/amount_sol and keep amount_x=0.
 
 WARNING: This executes a real on-chain transaction. Check DRY_RUN mode.`,
       parameters: {
@@ -168,7 +168,7 @@ WARNING: This executes a real on-chain transaction. Check DRY_RUN mode.`,
           strategy: {
             type: "string",
             enum: ["bid_ask", "spot"],
-            description: "DLMM strategy type. If user specifies, use exactly what they said. Otherwise omit — the system default from config.strategy.strategy will be used automatically."
+            description: "DLMM strategy type. If user specifies, use exactly what they said. Otherwise use the active strategy's lp_strategy field."
           },
           bins_below: {
             type: "number",
@@ -193,9 +193,9 @@ WARNING: This executes a real on-chain transaction. Check DRY_RUN mode.`,
           volatility: { type: "number", description: "Pool volatility at deploy time, sourced from max(screening timeframe, 30m)" },
           fee_tvl_ratio: { type: "number", description: "fee/TVL ratio at deploy time" },
           organic_score: { type: "number", description: "Base token organic score at deploy time" },
-          initial_value_usd: { type: "number", description: "USD value being deployed — REQUIRED for accurate PnL tracking" }
+          initial_value_usd: { type: "number", description: "Estimated USD value being deployed" }
         },
-        required: ["pool_address", "initial_value_usd"]
+        required: ["pool_address"]
       }
     }
   },
