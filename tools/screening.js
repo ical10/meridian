@@ -140,6 +140,9 @@ function getRawPoolScreeningRejectReason(pool, s) {
   if (s.minVolatility != null && volatility < s.minVolatility) {
     return `volatility ${volatility} below minVolatility ${s.minVolatility}`;
   }
+  if (s.maxVolatility != null && volatility > s.maxVolatility) {
+    return `volatility ${volatility} above maxVolatility ${s.maxVolatility}`;
+  }
   if (feeActiveTvlRatio == null) {
     return `fee/active-TVL unknown`;
   }

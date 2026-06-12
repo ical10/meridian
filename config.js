@@ -91,7 +91,8 @@ export const config = {
     // Example: [[0.5, 1.0], [3.0, null]] = "in [0.5, 1.0] OR in [3.0, ∞)".
     // API-level coarse filter uses overall min/max of bands (high=null → no API cap).
     feeActiveTvlBands:    Array.isArray(u.feeActiveTvlBands) ? u.feeActiveTvlBands : null,
-    minVolatility:        u.minVolatility        ?? null, // null = no floor; opt-in. data shows ≥5 cuts the loss-cluster band
+    minVolatility:        u.minVolatility        ?? null,
+    maxVolatility:        u.maxVolatility        ?? null, // null = no ceiling; opt-in. filters rug-prone extreme-volatility tokens
     minTvl:            u.minTvl            ?? 10_000,
     maxTvl:            u.maxTvl !== undefined ? u.maxTvl : 150_000,
     minVolume:         u.minVolume         ?? 500,
@@ -362,6 +363,7 @@ export function reloadScreeningThresholds() {
     if (fresh.maxFeeActiveTvlRatio !== undefined) s.maxFeeActiveTvlRatio = fresh.maxFeeActiveTvlRatio;
     if (fresh.feeActiveTvlBands !== undefined) s.feeActiveTvlBands = Array.isArray(fresh.feeActiveTvlBands) ? fresh.feeActiveTvlBands : null;
     if (fresh.minVolatility !== undefined) s.minVolatility = fresh.minVolatility;
+    if (fresh.maxVolatility !== undefined) s.maxVolatility = fresh.maxVolatility;
     if (fresh.minTokenFeesSol  != null) s.minTokenFeesSol  = fresh.minTokenFeesSol;
     if (fresh.maxTop10Pct      != null) s.maxTop10Pct      = fresh.maxTop10Pct;
     if (fresh.useDiscordSignals !== undefined) s.useDiscordSignals = fresh.useDiscordSignals;
