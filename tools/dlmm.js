@@ -171,8 +171,21 @@ function getMeridianHeaders() {
   return headers;
 }
 
+// Circuit breaker: after a relay close failure (e.g. the submit endpoint's
+// historical 504s), skip the relay entirely for a cooldown window so urgent
+// stop-loss closes go straight to the proven local fallback instead of
+// re-burning seconds on a flaky API during a dump.
+const RELAY_FAILURE_COOLDOWN_MS = 10 * 60 * 1000;
+let _relayFailedAt = 0;
+
+function recordRelayFailure() {
+  _relayFailedAt = Date.now();
+}
+
 function shouldUseLpAgentRelay() {
-  return !!config.api.lpAgentRelayEnabled;
+  if (!config.api.lpAgentRelayEnabled) return false;
+  if (Date.now() - _relayFailedAt < RELAY_FAILURE_COOLDOWN_MS) return false;
+  return true;
 }
 
 function shouldUseLpAgentRelayForDeploy() {
@@ -398,6 +411,24 @@ function signSerializedTransactions(serializedTxs, wallet) {
     .map((entry) => signSerializedTransaction(entry, wallet));
 }
 
+// A bundle leg that spends tokens produced by an EARLIER leg (e.g. the zap-out
+// swap selling tokens the close leg withdraws) can never simulate standalone:
+// the source token account is empty/missing until the prior leg lands. The
+// expected failures are SPL Token InsufficientFunds (custom 1) and Anchor
+// AccountNotInitialized (custom 3012). Callers opt in per leg via
+// `tolerateSequenceDependentFailure`; all static safety checks still run, and
+// atomic Jito-bundle submission means the leg cannot execute unless the fully
+// verified close leg lands first.
+const SEQUENCE_DEPENDENT_ERROR_CODES = new Set([1, 3012]);
+const SEQUENCE_DEPENDENT_LOG_MARKERS = ["insufficient funds", "accountnotinitialized", "account_not_initialized"];
+
+function isSequenceDependentSimFailure(value) {
+  const custom = value?.err?.InstructionError?.[1]?.Custom;
+  if (!SEQUENCE_DEPENDENT_ERROR_CODES.has(Number(custom))) return false;
+  const logs = (value?.logs || []).join("\n").toLowerCase();
+  return SEQUENCE_DEPENDENT_LOG_MARKERS.some((marker) => logs.includes(marker));
+}
+
 async function signAndSimulateRelayTransactions(serializedTxs, wallet, {
   label,
   allowedDebitMints = [],
@@ -405,6 +436,7 @@ async function signAndSimulateRelayTransactions(serializedTxs, wallet, {
   smallTransferLamports = 0,
   maxSolLoss = 0.05,
   requiredStaticAccounts = [],
+  tolerateSequenceDependentFailure = false,
 } = {}) {
   const signed = [];
   const owner = wallet.publicKey.toString();
@@ -431,6 +463,14 @@ async function signAndSimulateRelayTransactions(serializedTxs, wallet, {
     });
     const value = simulation.value;
     if (value.err) {
+      if (tolerateSequenceDependentFailure && isSequenceDependentSimFailure(value)) {
+        // Balance-delta checks are impossible on a failed sim; static checks
+        // above already passed and the leg only executes inside the atomic
+        // bundle after the fully simulated close leg.
+        log("close", `Relay ${label || "transaction"} ${index + 1}: sim failed with expected sequence-dependent error (${JSON.stringify(value.err)}) — accepting for atomic bundle`);
+        signed.push(signedBase64);
+        continue;
+      }
       throw new Error(`Relay ${label || "transaction"} ${index + 1} simulation failed: ${JSON.stringify(value.err)}`);
     }
 
@@ -1728,6 +1768,7 @@ export async function closePosition({ position_address, reason }) {
 
         const order = await meridianJson("/execution/zap-out/order", {
           method: "POST",
+          retry: { maxAttempts: 1, perAttemptTimeoutMs: 8_000, maxElapsedMs: 8_000 },
           headers: getMeridianHeaders(),
           body: JSON.stringify({
             agentId: config.hiveMind.agentId || "agent-local",
@@ -1765,11 +1806,16 @@ export async function closePosition({ position_address, reason }) {
           smallTransferLamports: RELAY_SMALL_TRANSFER_LAMPORTS,
           maxSolLoss: 0.05,
           requiredStaticAccounts: [wallet.publicKey.toString()],
+          // The swap sells tokens the close leg withdraws — its source ATA is
+          // empty until the close lands, so standalone simulation must be
+          // allowed to fail with InsufficientFunds/AccountNotInitialized.
+          tolerateSequenceDependentFailure: true,
         });
 
         relaySubmitted = true;
         const submit = await meridianJson("/execution/zap-out/submit", {
           method: "POST",
+          retry: { maxAttempts: 1, perAttemptTimeoutMs: 20_000, maxElapsedMs: 20_000 },
           headers: getMeridianHeaders(),
           body: JSON.stringify({
             requestId: order.requestId,
@@ -1960,8 +2006,9 @@ export async function closePosition({ position_address, reason }) {
           base_mint: livePosition?.base_mint || null,
         };
       } catch (relayError) {
+        recordRelayFailure();
         if (relaySubmitted) throw relayError;
-        log("close_warn", `Relay zap-out failed before submit; falling back to local close + Jupiter autoswap: ${relayError.message}`);
+        log("close_warn", `Relay zap-out failed before submit; falling back to local close + Jupiter autoswap (relay disabled for 10m): ${relayError.message}`);
       }
     }
 
