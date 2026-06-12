@@ -32,6 +32,12 @@ const PERFORMANCE_SIGNAL_FIELDS = [
   "entry_volume",
 ];
 const MAX_MANUAL_LESSON_LENGTH = 400;
+// Minimum realized PnL % required to derive a "PREFER" lesson.
+// Below this, small wins still get classified as "WORKED" but don't get the
+// strong PREFER tag that biases future LLM screening toward repeat-deploys.
+// Prevents the HUNTER-class loop where the bot keeps re-deploying into pools
+// with mediocre +1-3% closes because each one re-triggers the PREFER bias.
+const MIN_PREFER_PNL_PCT = 5;
 
 function sanitizeLessonText(text, maxLen = MAX_MANUAL_LESSON_LENGTH) {
   if (text == null) return null;
@@ -256,7 +262,7 @@ function derivLesson(perf) {
     if (perf.range_efficiency < 30 && outcome === "bad") {
       rule = `AVOID: ${perf.pool_name}-type pools (volatility=${perf.volatility}, bin_step=${perf.bin_step}) with strategy="${perf.strategy}" — went OOR ${100 - perf.range_efficiency}% of the time. Consider wider bin_range or bid_ask strategy.`;
       tags.push("oor", perf.strategy, `volatility_${Math.round(perf.volatility)}`);
-    } else if (perf.range_efficiency > 80 && outcome === "good") {
+    } else if (perf.range_efficiency > 80 && outcome === "good" && perf.pnl_pct >= MIN_PREFER_PNL_PCT) {
       const entryNote = perf.entry_mcap != null ? ` Entry: mcap=${fmtNum(perf.entry_mcap)}, tvl=${fmtNum(perf.entry_tvl)}, vol=${fmtNum(perf.entry_volume)}.` : "";
       rule = `PREFER: ${perf.pool_name}-type pools (volatility=${perf.volatility}, bin_step=${perf.bin_step}) with strategy="${perf.strategy}" — ${perf.range_efficiency}% in-range efficiency, PnL +${perf.pnl_pct}%.${entryNote}`;
       tags.push("efficient", perf.strategy);
