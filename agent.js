@@ -214,6 +214,12 @@ export async function agentLoop(goal, maxSteps = config.llm.maxSteps, sessionHis
             temperature: config.llm.temperature,
             max_tokens: maxOutputTokens ?? config.llm.maxTokens,
           };
+          // DeepSeek v4-flash and similar models default to thinking mode, which (a) does
+          // not support tool_choice=required and (b) burns the max_tokens budget on
+          // reasoning tokens before producing visible output. Explicitly disable.
+          if (typeof usedModel === "string" && usedModel.toLowerCase().includes("deepseek")) {
+            reqParams.thinking = { type: "disabled" };
+          }
           if (!omitToolChoice) reqParams.tool_choice = toolChoice;
           response = await client.chat.completions.create(reqParams);
         } catch (error) {
