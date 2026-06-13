@@ -11,6 +11,9 @@ export const CONFIG_MAP = {
   // screening
   screeningSource: ["screening", "source"],
   minFeeActiveTvlRatio: ["screening", "minFeeActiveTvlRatio"],
+  maxFeeActiveTvlRatio: ["screening", "maxFeeActiveTvlRatio"],
+  feeActiveTvlBands: ["screening", "feeActiveTvlBands"],
+  minVolatility: ["screening", "minVolatility"],
   excludeHighSupplyConcentration: ["screening", "excludeHighSupplyConcentration"],
   minTvl: ["screening", "minTvl"],
   maxTvl: ["screening", "maxTvl"],
