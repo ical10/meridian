@@ -19,6 +19,7 @@ export const CONFIG_MAP = {
   maxTvl: ["screening", "maxTvl"],
   minVolume: ["screening", "minVolume"],
   minOrganic: ["screening", "minOrganic"],
+  maxOrganic: ["screening", "maxOrganic"],
   minQuoteOrganic: ["screening", "minQuoteOrganic"],
   minHolders: ["screening", "minHolders"],
   minMcap: ["screening", "minMcap"],

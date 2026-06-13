@@ -169,6 +169,9 @@ function getRawPoolScreeningRejectReason(pool, s) {
   if (baseOrganic == null || baseOrganic < s.minOrganic) {
     return `base organic ${baseOrganic ?? "unknown"} below minOrganic ${s.minOrganic}`;
   }
+  if (s.maxOrganic != null && baseOrganic > s.maxOrganic) {
+    return `base organic ${baseOrganic} above maxOrganic ${s.maxOrganic}`;
+  }
   if (quoteOrganic == null || quoteOrganic < s.minQuoteOrganic) {
     return `quote organic ${quoteOrganic ?? "unknown"} below minQuoteOrganic ${s.minQuoteOrganic}`;
   }
