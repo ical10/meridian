@@ -25,6 +25,7 @@ export const CONFIG_MAP = {
   minMcap: ["screening", "minMcap"],
   maxPriceChangePct: ["screening", "maxPriceChangePct"],
   maxHourlyDumpPct: ["screening", "maxHourlyDumpPct"],
+  maxHourlyPumpPct: ["screening", "maxHourlyPumpPct"],
   maxMcap: ["screening", "maxMcap"],
   minBinStep: ["screening", "minBinStep"],
   maxBinStep: ["screening", "maxBinStep"],

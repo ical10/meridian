@@ -29,6 +29,30 @@ function normalizeSymbol(symbol) {
   return String(symbol || "").trim().toUpperCase();
 }
 
+// Reliable 1h price-change percent for the momentum gate, from the Meteora
+// pool-discovery API at timeframe=1h — the same infra the primary discovery
+// already depends on, so if a candidate exists at all this call works. OKX is
+// intentionally not used (it has been returning unavailable). GMGN was evaluated
+// as a fallback but exposes no clean per-token 1h endpoint (price change lives
+// only on its ranked-list feed), so the gate fails closed instead. Returns a
+// percent (e.g. 40 = +40%) or null when unavailable.
+async function fetchReliableHourlyChange(poolAddress) {
+  if (!poolAddress) return null;
+  try {
+    const url = `${POOL_DISCOVERY_BASE}/pools?page_size=1&timeframe=1h&filter_by=${encodeURIComponent(`pool_address=${poolAddress}`)}`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(8_000) });
+    if (res.ok) {
+      const data = await res.json();
+      const pool = (data?.data || data?.pools || [])[0];
+      const change = Number(pool?.base_token_market_cap_change_pct);
+      if (Number.isFinite(change)) return change;
+    }
+  } catch (error) {
+    log("screening", `Meteora 1h change failed for ${String(poolAddress).slice(0, 8)}: ${error.message}`);
+  }
+  return null;
+}
+
 function scoreCandidate(pool) {
   if (Number.isFinite(Number(pool.gmgn_score))) {
     return Number(pool.gmgn_score) + Number(pool.fee_active_tvl_ratio || 0) * 500;
@@ -721,6 +745,33 @@ export async function getTopCandidates({ limit = 10 } = {}) {
         log("screening", `PVP hard filter removed ${before - eligible.length} pool(s)`);
       }
     }
+  }
+
+  // ── 1h momentum gate (OKX-independent: Meteora 1h primary, GMGN fallback) ──
+  // Blocks parabolic entries the screening-timeframe maxPriceChangePct misses
+  // (e.g. a token +40% over 1h but only +5% in the last 30m). Single-sided SOL
+  // deploys under a pump buy the token all the way down on the inevitable
+  // reversal. maxHourlyPumpPct is fail-closed: a candidate whose 1h change can't
+  // be verified is dropped, matching the high-conviction posture.
+  const maxHourlyPump = config.screening.maxHourlyPumpPct;
+  if (maxHourlyPump != null && eligible.length > 0) {
+    await Promise.all(eligible.map(async (p) => {
+      p.price_change_1h_reliable = await fetchReliableHourlyChange(p.pool);
+    }));
+    eligible.splice(0, eligible.length, ...eligible.filter((p) => {
+      const ch = p.price_change_1h_reliable;
+      if (ch == null) {
+        log("screening", `Hourly pump gate: dropped ${p.name} — 1h change unavailable (fail-closed)`);
+        pushFilteredReason(filteredOut, p, "1h change unavailable (fail-closed)");
+        return false;
+      }
+      if (ch > maxHourlyPump) {
+        log("screening", `Hourly pump gate: dropped ${p.name} — 1h +${ch.toFixed(1)}% > +${maxHourlyPump}% (parabolic entry)`);
+        pushFilteredReason(filteredOut, p, `1h pump +${ch.toFixed(1)}% > +${maxHourlyPump}%`);
+        return false;
+      }
+      return true;
+    }));
   }
 
   // Enrich with OKX data — advanced info (risk/bundle/sniper) + ATH price (no API key required)

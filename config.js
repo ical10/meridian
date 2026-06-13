@@ -103,6 +103,7 @@ export const config = {
     minMcap:           u.minMcap           ?? 150_000,
     maxPriceChangePct: u.maxPriceChangePct ?? null, // null disables; X = skip pools whose price moved more than ±X% over the screening timeframe (catches post-pump knife-catches and free-falling pools)
     maxHourlyDumpPct:  u.maxHourlyDumpPct  ?? null, // null disables; X = skip pools dumping more than X% over 1h (catches falling-knife entries — MOGMAN had -25% 1h drop at deploy)
+    maxHourlyPumpPct:  u.maxHourlyPumpPct  ?? null, // null disables; X = skip pools that PUMPED more than X% over 1h (blocks parabolic entries; Meteora 1h source, fail-closed)
     maxBundlePct:      u.maxBundlePct      ?? 30,  // max bundle holding % (OKX advanced-info)
     maxMcap:           u.maxMcap           ?? 10_000_000,
     minBinStep:        u.minBinStep        ?? 80,
@@ -366,6 +367,7 @@ export function reloadScreeningThresholds() {
     if (fresh.feeActiveTvlBands !== undefined) s.feeActiveTvlBands = Array.isArray(fresh.feeActiveTvlBands) ? fresh.feeActiveTvlBands : null;
     if (fresh.minVolatility !== undefined) s.minVolatility = fresh.minVolatility;
     if (fresh.maxVolatility !== undefined) s.maxVolatility = fresh.maxVolatility;
+    if (fresh.maxHourlyPumpPct !== undefined) s.maxHourlyPumpPct = fresh.maxHourlyPumpPct;
     if (fresh.minTokenFeesSol  != null) s.minTokenFeesSol  = fresh.minTokenFeesSol;
     if (fresh.maxTop10Pct      != null) s.maxTop10Pct      = fresh.maxTop10Pct;
     if (fresh.useDiscordSignals !== undefined) s.useDiscordSignals = fresh.useDiscordSignals;
