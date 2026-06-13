@@ -4,7 +4,7 @@ import { isDevBlocked, getBlockedDevs } from "../dev-blocklist.js";
 import { log } from "../logger.js";
 import { isBaseMintOnCooldown, isPoolOnCooldown } from "../pool-memory.js";
 import { confirmIndicatorPreset } from "./chart-indicators.js";
-import { discoverGmgnPools } from "./gmgn.js";
+import { discoverGmgnPools, hasGmgnApiKey } from "./gmgn.js";
 
 const DATAPI_JUP = "https://datapi.jup.ag/v1";
 
@@ -793,9 +793,37 @@ export async function getTopCandidates({ limit = 10 } = {}) {
     }
   }
 
-  // Enrich with OKX data — advanced info (risk/bundle/sniper) + ATH price (no API key required)
-  // Skipped for GMGN: bundler/bot/wash data already sourced from GMGN pipeline
-  if (source !== "gmgn" && eligible.length > 0) {
+  // ── GMGN risk enrichment (replaces OKX advanced-info when OKX is down) ──
+  // Populates bundle %, sniper %, ATH distance, top-10 concentration, bot-degen
+  // %, and smart-wallet count from GMGN /v1/token/info — the same authenticated
+  // endpoint already used for fees. Feeds the bundle and ATH hard filters below
+  // (they read p.bundle_pct / p.price_vs_ath_pct) plus the LLM candidate view.
+  // The OKX block beneath only runs when GMGN is unavailable (no key), so we
+  // don't double-fetch or stack the dead OKX calls. Note: GMGN exposes no wash-
+  // trading flag, so p.is_wash stays null and the wash filter no-ops (it was
+  // already inert with OKX down); bot-degen % and the Jupiter bot-holder filter
+  // cover related manipulation risk.
+  let gmgnRiskEnriched = false;
+  if (source !== "gmgn" && hasGmgnApiKey() && eligible.length > 0) {
+    const { getGmgnTokenRisk } = await import("./gmgn.js");
+    await Promise.all(eligible.map(async (p) => {
+      if (!p.base?.mint) return;
+      const risk = await getGmgnTokenRisk(p.base.mint).catch(() => null);
+      if (!risk) return;
+      if (risk.bundle_pct != null) p.bundle_pct = risk.bundle_pct;
+      if (risk.sniper_pct != null) p.sniper_pct = risk.sniper_pct;
+      if (risk.price_vs_ath_pct != null) p.price_vs_ath_pct = risk.price_vs_ath_pct;
+      if (risk.top10_pct != null) p.top10_pct = risk.top10_pct;
+      if (risk.bot_degen_pct != null) p.bot_degen_pct = risk.bot_degen_pct;
+      if (risk.smart_wallets != null) p.gmgn_smart_wallets = risk.smart_wallets;
+      if (risk.creator_status) p.gmgn_creator_status = risk.creator_status;
+      gmgnRiskEnriched = true;
+    }));
+  }
+
+  // Enrich with OKX data — advanced info (risk/bundle/sniper) + ATH price.
+  // Fallback only: skipped when GMGN risk enrichment already ran (above).
+  if (source !== "gmgn" && !gmgnRiskEnriched && eligible.length > 0) {
     const { getAdvancedInfo, getPriceInfo, getClusterList, getRiskFlags } = await import("./okx.js");
     const okxResults = await Promise.allSettled(
       eligible.map(async (p) => {

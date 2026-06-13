@@ -753,3 +753,38 @@ export async function getGmgnTokenFees(mint) {
     return null;
   }
 }
+
+// Token risk/concentration data from GMGN /v1/token/info — replacement source for
+// the OKX advanced-info filters (bundle %, ATH distance, sniper, concentration)
+// when screeningSource=meteora. GMGN's stat rates are fractions (0.067 = 6.7%);
+// returned values are normalized to percent to match the OKX-era config keys.
+export async function getGmgnTokenRisk(mint) {
+  if (!mint || !hasGmgnApiKey()) return null;
+  try {
+    const payload = await gmgnFetch("/v1/token/info", { params: { chain: "sol", address: mint } });
+    const info = payload?.data?.data || payload?.data || payload;
+    if (!info || typeof info !== "object") return null;
+    const stat = info.stat || {};
+    const tags = info.wallet_tags_stat || {};
+    const toNum = (v) => (Number.isFinite(Number(v)) ? Number(v) : null);
+    const toPct = (v) => (Number.isFinite(Number(v)) ? Number((Number(v) * 100).toFixed(2)) : null);
+    const price = toNum(info.price?.price);
+    const ath = toNum(info.ath_price);
+    const price1h = toNum(info.price?.price_1h);
+    return {
+      bundle_pct: toPct(stat.top_bundler_trader_percentage),
+      sniper_pct: toPct(stat.top70_sniper_hold_rate),
+      top10_pct: toPct(stat.top_10_holder_rate),
+      bot_degen_pct: toPct(stat.bot_degen_rate),
+      rat_trader_pct: toPct(stat.top_rat_trader_percentage),
+      smart_wallets: toNum(tags.smart_wallets),
+      sniper_wallets: toNum(tags.sniper_wallets),
+      price_vs_ath_pct: (price != null && ath != null && ath > 0) ? Number(((price / ath) * 100).toFixed(1)) : null,
+      price_change_1h: (price != null && price1h != null && price1h > 0) ? Number((((price - price1h) / price1h) * 100).toFixed(1)) : null,
+      creator_status: info.dev?.creator_token_status || null,
+    };
+  } catch (error) {
+    log("gmgn", `token risk lookup failed for ${String(mint).slice(0, 8)}: ${error.message}`);
+    return null;
+  }
+}
