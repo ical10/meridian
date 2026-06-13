@@ -747,31 +747,50 @@ export async function getTopCandidates({ limit = 10 } = {}) {
     }
   }
 
-  // ── 1h momentum gate (OKX-independent: Meteora 1h primary, GMGN fallback) ──
-  // Blocks parabolic entries the screening-timeframe maxPriceChangePct misses
-  // (e.g. a token +40% over 1h but only +5% in the last 30m). Single-sided SOL
-  // deploys under a pump buy the token all the way down on the inevitable
-  // reversal. maxHourlyPumpPct is fail-closed: a candidate whose 1h change can't
-  // be verified is dropped, matching the high-conviction posture.
+  // ── 1h momentum gates (OKX-independent: Meteora pool-discovery timeframe=1h) ──
+  // One reliable 1h fetch feeds both gates:
+  //   • Pump gate (maxHourlyPumpPct) — blocks parabolic entries the screening-
+  //     timeframe maxPriceChangePct misses (e.g. +40%/1h but only +5%/30m).
+  //     Fail-closed: a candidate whose 1h change can't be verified is dropped.
+  //   • Dump gate (maxHourlyDumpPct) — catches falling-knife entries. Fail-open:
+  //     only confirmed dumps are dropped (a missing reading shouldn't force-drop
+  //     when only dump protection is requested). Pump-gate survivors already
+  //     carry a verified value.
+  // Single-sided SOL deploys are maximally exposed to both: a pump buys the
+  // token all the way down on reversal, a dump does the same in real time.
   const maxHourlyPump = config.screening.maxHourlyPumpPct;
-  if (maxHourlyPump != null && eligible.length > 0) {
+  const maxHourlyDump = config.screening.maxHourlyDumpPct;
+  if ((maxHourlyPump != null || maxHourlyDump != null) && eligible.length > 0) {
     await Promise.all(eligible.map(async (p) => {
       p.price_change_1h_reliable = await fetchReliableHourlyChange(p.pool);
     }));
-    eligible.splice(0, eligible.length, ...eligible.filter((p) => {
-      const ch = p.price_change_1h_reliable;
-      if (ch == null) {
-        log("screening", `Hourly pump gate: dropped ${p.name} — 1h change unavailable (fail-closed)`);
-        pushFilteredReason(filteredOut, p, "1h change unavailable (fail-closed)");
-        return false;
-      }
-      if (ch > maxHourlyPump) {
-        log("screening", `Hourly pump gate: dropped ${p.name} — 1h +${ch.toFixed(1)}% > +${maxHourlyPump}% (parabolic entry)`);
-        pushFilteredReason(filteredOut, p, `1h pump +${ch.toFixed(1)}% > +${maxHourlyPump}%`);
-        return false;
-      }
-      return true;
-    }));
+    if (maxHourlyPump != null) {
+      eligible.splice(0, eligible.length, ...eligible.filter((p) => {
+        const ch = p.price_change_1h_reliable;
+        if (ch == null) {
+          log("screening", `Hourly pump gate: dropped ${p.name} — 1h change unavailable (fail-closed)`);
+          pushFilteredReason(filteredOut, p, "1h change unavailable (fail-closed)");
+          return false;
+        }
+        if (ch > maxHourlyPump) {
+          log("screening", `Hourly pump gate: dropped ${p.name} — 1h +${ch.toFixed(1)}% > +${maxHourlyPump}% (parabolic entry)`);
+          pushFilteredReason(filteredOut, p, `1h pump +${ch.toFixed(1)}% > +${maxHourlyPump}%`);
+          return false;
+        }
+        return true;
+      }));
+    }
+    if (maxHourlyDump != null) {
+      eligible.splice(0, eligible.length, ...eligible.filter((p) => {
+        const ch = p.price_change_1h_reliable;
+        if (Number.isFinite(ch) && ch < -Math.abs(maxHourlyDump)) {
+          log("screening", `Hourly dump gate: dropped ${p.name} — 1h ${ch.toFixed(1)}% < -${maxHourlyDump}% (falling knife)`);
+          pushFilteredReason(filteredOut, p, `1h dump ${ch.toFixed(1)}% < -${maxHourlyDump}%`);
+          return false;
+        }
+        return true;
+      }));
+    }
   }
 
   // Enrich with OKX data — advanced info (risk/bundle/sniper) + ATH price (no API key required)
@@ -858,20 +877,8 @@ export async function getTopCandidates({ limit = 10 } = {}) {
       }));
     }
 
-    // Hourly dump filter — drops pools dumping more than threshold over 1h.
-    // Catches falling-knife entries that the timeframe-specific (e.g. 30m)
-    // maxPriceChangePct filter misses. MOGMAN-SOL had -25% 1h drop at deploy.
-    const maxHourlyDrop = config.screening.maxHourlyDumpPct;
-    if (maxHourlyDrop != null) {
-      eligible.splice(0, eligible.length, ...eligible.filter((p) => {
-        if (Number.isFinite(p.price_change_1h) && p.price_change_1h < -Math.abs(maxHourlyDrop)) {
-          log("screening", `Hourly dump filter: dropped ${p.name} — 1h ${p.price_change_1h.toFixed(1)}% < -${maxHourlyDrop}%`);
-          pushFilteredReason(filteredOut, p, `1h drop ${p.price_change_1h.toFixed(1)}% < -${maxHourlyDrop}%`);
-          return false;
-        }
-        return true;
-      }));
-    }
+    // (Hourly dump filter moved to the OKX-independent momentum gate above,
+    // which sources 1h change from Meteora instead of the unreliable OKX feed.)
 
     // ATH filter — drop pools where price is too close to ATH
     const athFilter = config.screening.athFilterPct;
