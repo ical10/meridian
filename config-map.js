@@ -73,6 +73,8 @@ export const CONFIG_MAP = {
   gasReserve: ["management", "gasReserve"],
   positionSizePct: ["management", "positionSizePct"],
   minAgeBeforeYieldCheck: ["management", "minAgeBeforeYieldCheck"],
+  deadPoolMinAgeMinutes: ["management", "deadPoolMinAgeMinutes"],
+  deadPoolMaxPeakPct: ["management", "deadPoolMaxPeakPct"],
   // risk
   maxPositions: ["risk", "maxPositions"],
   maxDeployAmount: ["risk", "maxDeployAmount"],
